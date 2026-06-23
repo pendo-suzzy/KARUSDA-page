@@ -1,0 +1,55 @@
+.sabbath-horizon {
+  text-align: center;
+}
+
+.sabbath-horizon__title {
+  font-family: var(--font-display);
+  font-size: clamp(1.5rem, 3vw, 2.1rem);
+  font-weight: 600;
+  margin: 0.3rem 0 var(--space-3);
+}
+
+.sabbath-horizon__scroll {
+  overflow-x: auto;
+  padding-bottom: 0.5rem;
+}
+
+.sabbath-horizon__svg {
+  width: 100%;
+  min-width: 760px;
+  height: auto;
+  display: block;
+}
+
+.sh-label {
+  font-family: var(--font-body);
+  font-size: 15px;
+  font-weight: 600;
+  fill: var(--ink);
+}
+
+.sh-time {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  fill: var(--clay);
+}
+
+.sh-day {
+  font-family: var(--font-mono);
+  font-size: 14px;
+  letter-spacing: 0.08em;
+  fill: var(--ink-soft);
+}
+
+.sabbath-horizon__caption {
+  max-width: 46ch;
+  margin: var(--space-2) auto 0;
+  color: var(--ink-soft);
+  font-size: 0.92rem;
+}
+
+@media (max-width: 640px) {
+  .sabbath-horizon__svg {
+    min-width: 640px;
+  }
+}
