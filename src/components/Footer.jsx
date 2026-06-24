@@ -1,8 +1,19 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
+import emailjs from "@emailjs/browser";
 import { useApp } from "../context/AppContext";
 import "./Footer.css";
 
-/* Inline SVG icons — lightweight, no extra dependency */
+// ── EmailJS credentials (set in .env file) ──────────────────────────────────
+const EJS_PUBLIC_KEY  = import.meta.env.VITE_EMAILJS_PUBLIC_KEY  || "";
+const EJS_SERVICE_ID  = import.meta.env.VITE_EMAILJS_SERVICE_ID  || "";
+const EJS_TEMPLATE_ID = import.meta.env.VITE_EMAILJS_TEMPLATE_ID || "";
+const CHURCH_EMAIL    = "karatinauniversitysdachurch@gmail.com";
+
+// ── Check whether EmailJS is configured ─────────────────────────────────────
+const EJS_READY = EJS_PUBLIC_KEY && EJS_SERVICE_ID && EJS_TEMPLATE_ID
+  && !EJS_PUBLIC_KEY.includes("YOUR_");
+
+/* ── Inline SVG icons ─────────────────────────────────────────────────────── */
 const IconInstagram = () => (
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="footer__icon-svg">
     <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
@@ -37,37 +48,68 @@ const IconMapPin = () => (
   </svg>
 );
 
-const CHURCH_EMAIL = "karatinauniversitysdachurch@gmail.com";
-
+/* ── Footer component ─────────────────────────────────────────────────────── */
 export default function Footer() {
   const { data } = useApp();
   const { contact } = data;
+  const formRef = useRef(null);
 
   const [formData, setFormData] = useState({ name: "", subject: "", message: "" });
-  const [formType, setFormType] = useState("prayer"); // "prayer" or "message"
-  const [sent, setSent] = useState(false);
+  const [formType, setFormType] = useState("prayer");
+  const [status, setStatus] = useState(null); // null | "sending" | "success" | "error"
 
   const handleChange = (e) => {
     setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    const subjectPrefix = formType === "prayer" ? "Prayer Request" : "Message";
+    setStatus("sending");
+
+    const subjectPrefix = formType === "prayer" ? "🙏 Prayer Request" : "✉️ Message";
     const subject = formData.subject
       ? `${subjectPrefix}: ${formData.subject}`
       : `${subjectPrefix} from ${formData.name || "Website Visitor"}`;
-    const body = `From: ${formData.name || "Anonymous"}\n\n${formData.message}`;
-    const mailtoLink = `mailto:${CHURCH_EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-    window.open(mailtoLink, "_blank");
-    setSent(true);
-    setFormData({ name: "", subject: "", message: "" });
-    setTimeout(() => setSent(false), 4000);
+
+    // ── If EmailJS is configured, send directly ──────────────────────────
+    if (EJS_READY) {
+      try {
+        await emailjs.send(
+          EJS_SERVICE_ID,
+          EJS_TEMPLATE_ID,
+          {
+            from_name:    formData.name || "Anonymous",
+            subject_line: subject,
+            message:      formData.message,
+            form_type:    formType === "prayer" ? "Prayer Request" : "General Message",
+            reply_to:     CHURCH_EMAIL,
+            to_email:     CHURCH_EMAIL,
+          },
+          EJS_PUBLIC_KEY
+        );
+        setStatus("success");
+        setFormData({ name: "", subject: "", message: "" });
+        setTimeout(() => setStatus(null), 6000);
+      } catch (err) {
+        console.error("EmailJS error:", err);
+        setStatus("error");
+        setTimeout(() => setStatus(null), 6000);
+      }
+    } else {
+      // ── Fallback: open user's email client ─────────────────────────────
+      const body = `From: ${formData.name || "Anonymous"}\n\n${formData.message}`;
+      const mailtoLink = `mailto:${CHURCH_EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+      window.open(mailtoLink, "_blank");
+      setStatus("mailto");
+      setFormData({ name: "", subject: "", message: "" });
+      setTimeout(() => setStatus(null), 5000);
+    }
   };
 
   return (
     <footer className="footer">
       <div className="container footer__grid">
+
         {/* Brand & Tagline */}
         <div className="footer__col">
           <div className="footer__brand">KARUSDA</div>
@@ -75,36 +117,14 @@ export default function Footer() {
             Karatina University Seventh-day Adventist Church — worshipping,
             serving, and sending, one Sabbath at a time.
           </p>
-          {/* Social icons */}
           <div className="footer__socials">
-            <a
-              href="https://www.instagram.com/karusda_2025?igsh=NHg5YmF6ejF3emg0"
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label="Follow us on Instagram"
-              title="Follow us on Instagram"
-              className="footer__social-link footer__social-link--instagram"
-            >
+            <a href="https://www.instagram.com/karusda_2025?igsh=NHg5YmF6ejF3emg0" target="_blank" rel="noopener noreferrer" aria-label="Follow us on Instagram" title="Follow us on Instagram" className="footer__social-link footer__social-link--instagram">
               <IconInstagram />
             </a>
-            <a
-              href="https://www.facebook.com/karusda.main?mibextid=rS40aB7S9Ucbxw6v"
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label="Follow us on Facebook"
-              title="Follow us on Facebook"
-              className="footer__social-link footer__social-link--facebook"
-            >
+            <a href="https://www.facebook.com/karusda.main?mibextid=rS40aB7S9Ucbxw6v" target="_blank" rel="noopener noreferrer" aria-label="Follow us on Facebook" title="Follow us on Facebook" className="footer__social-link footer__social-link--facebook">
               <IconFacebook />
             </a>
-            <a
-              href="https://www.youtube.com/@UCmFWvxiBFvwYkJbsQ8zdMXg"
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label="Subscribe on YouTube"
-              title="Subscribe on YouTube"
-              className="footer__social-link footer__social-link--youtube"
-            >
+            <a href="https://www.youtube.com/@UCmFWvxiBFvwYkJbsQ8zdMXg" target="_blank" rel="noopener noreferrer" aria-label="Subscribe on YouTube" title="Subscribe on YouTube" className="footer__social-link footer__social-link--youtube">
               <IconYouTube />
             </a>
           </div>
@@ -121,39 +141,48 @@ export default function Footer() {
             <IconMail />
             <a href={`mailto:${CHURCH_EMAIL}`}>{CHURCH_EMAIL}</a>
           </p>
-
           <p className="eyebrow footer__heading" style={{ marginTop: "1.2rem" }}>Sabbath hours</p>
           <p className="footer__line">Saturdays, 7:00 AM – 5:00 PM</p>
           <p className="footer__line">Friday vespers from 5:00 PM</p>
         </div>
 
-        {/* Prayer Request / Message Form */}
+        {/* Form */}
         <div className="footer__col footer__col--form">
           <p className="eyebrow footer__heading">Send us a message</p>
+
+          {/* Toggle */}
           <div className="footer__form-toggle">
-            <button
-              type="button"
-              className={`footer__toggle-btn ${formType === "prayer" ? "footer__toggle-btn--active" : ""}`}
-              onClick={() => setFormType("prayer")}
-            >
+            <button type="button" className={`footer__toggle-btn ${formType === "prayer" ? "footer__toggle-btn--active" : ""}`} onClick={() => setFormType("prayer")}>
               🙏 Prayer Request
             </button>
-            <button
-              type="button"
-              className={`footer__toggle-btn ${formType === "message" ? "footer__toggle-btn--active" : ""}`}
-              onClick={() => setFormType("message")}
-            >
+            <button type="button" className={`footer__toggle-btn ${formType === "message" ? "footer__toggle-btn--active" : ""}`} onClick={() => setFormType("message")}>
               ✉️ Message
             </button>
           </div>
 
-          {sent && (
-            <div className="footer__sent-msg">
-              ✅ Your email client should open with the {formType === "prayer" ? "prayer request" : "message"} ready to send!
+          {/* Status feedback */}
+          {status === "success" && (
+            <div className="footer__status footer__status--success">
+              ✅ {formType === "prayer" ? "Prayer request" : "Message"} sent to the church! We'll be in touch.
+            </div>
+          )}
+          {status === "sending" && (
+            <div className="footer__status footer__status--sending">
+              ⏳ Sending…
+            </div>
+          )}
+          {status === "error" && (
+            <div className="footer__status footer__status--error">
+              ❌ Something went wrong. Please email us directly at <strong>{CHURCH_EMAIL}</strong>
+            </div>
+          )}
+          {status === "mailto" && (
+            <div className="footer__status footer__status--success">
+              ✅ Your email client should now open with the message ready to send!
             </div>
           )}
 
-          <form className="footer__form" onSubmit={handleSubmit}>
+          <form ref={formRef} className="footer__form" onSubmit={handleSubmit}>
             <input
               type="text"
               name="name"
@@ -161,6 +190,7 @@ export default function Footer() {
               value={formData.name}
               onChange={handleChange}
               className="footer__input"
+              disabled={status === "sending"}
             />
             <input
               type="text"
@@ -169,6 +199,7 @@ export default function Footer() {
               value={formData.subject}
               onChange={handleChange}
               className="footer__input"
+              disabled={status === "sending"}
             />
             <textarea
               name="message"
@@ -178,13 +209,24 @@ export default function Footer() {
               className="footer__textarea"
               rows={3}
               required
+              disabled={status === "sending"}
             />
-            <button type="submit" className="footer__submit-btn">
-              {formType === "prayer" ? "Send Prayer Request" : "Send Message"}
+            <button
+              type="submit"
+              className="footer__submit-btn"
+              disabled={status === "sending"}
+            >
+              {status === "sending"
+                ? "Sending…"
+                : formType === "prayer"
+                ? "Send Prayer Request"
+                : "Send Message"}
             </button>
-            <p className="footer__form-note">
-              Opens your email app to send to <strong>{CHURCH_EMAIL}</strong>
-            </p>
+            {!EJS_READY && (
+              <p className="footer__form-note">
+                ⚠️ EmailJS not configured yet — will open your email client as fallback.
+              </p>
+            )}
           </form>
         </div>
       </div>

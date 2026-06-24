@@ -200,15 +200,34 @@
   box-shadow: 0 4px 14px rgba(194, 160, 86, 0.35);
 }
 
-.footer__sent-msg {
-  padding: 0.55rem 0.75rem;
+.footer__status {
+  padding: 0.6rem 0.75rem;
   border-radius: 6px;
+  font-size: 0.82rem;
+  margin-bottom: 0.5rem;
+  animation: footerFadeIn 0.3s ease;
+}
+
+.footer__status--success {
   background: rgba(76, 175, 80, 0.15);
   border: 1px solid rgba(76, 175, 80, 0.4);
   color: #a5d6a7;
-  font-size: 0.82rem;
-  margin-bottom: 0.4rem;
-  animation: footerFadeIn 0.3s ease;
+}
+
+.footer__status--sending {
+  background: rgba(194, 160, 86, 0.12);
+  border: 1px solid rgba(194, 160, 86, 0.3);
+  color: rgba(246, 241, 228, 0.75);
+}
+
+.footer__status--error {
+  background: rgba(229, 57, 53, 0.12);
+  border: 1px solid rgba(229, 57, 53, 0.35);
+  color: #ef9a9a;
+}
+
+.footer__status--error strong {
+  color: #ffcdd2;
 }
 
 @keyframes footerFadeIn {
