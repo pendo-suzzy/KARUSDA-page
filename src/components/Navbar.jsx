@@ -16,7 +16,7 @@ export default function Navbar() {
     <header className="navbar">
       <div className="container navbar__row">
         <NavLink to="/" className="navbar__brand" onClick={() => setOpen(false)}>
-          <span className="navbar__mark">K</span>
+          <img src="/sdalogo.png" alt="Seventh-day Adventist Church Logo" className="navbar__logo-img" />
           <span className="navbar__name">
             KARUSDA
             <span className="navbar__sub">Karatina University SDA Church</span>

@@ -73,7 +73,7 @@ export default function Events() {
 
       <section className="section gallery">
         <div className="container">
-          <p className="eyebrow" style={{ color: "var(--gold-soft)" }}>In pictures</p>
+          <p className="eyebrow" style={{ color: "var(--gold-soft)" }}>Gallery</p>
           <h2 className="section__title" style={{ color: "var(--paper)" }}>
             Recent missions &amp; fellowship
           </h2>

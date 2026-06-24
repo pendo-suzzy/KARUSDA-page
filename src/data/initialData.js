@@ -127,7 +127,7 @@ export const initialData = {
   ],
 
   choir: {
-    name: "KARUSDA Voices",
+    name: "KARUSDA Grand Choir",
     members: 62,
     leadName: "Bro. Daniel Mwangi",
     practiceTimes: [
@@ -136,12 +136,68 @@ export const initialData = {
     ],
     description:
       "Sixty-plus vocalists leading worship in four-part harmony every Sabbath and at special programs across the year.",
+    videos: [
+      {
+        id: "cv1",
+        title: "KARUSDA Voices - Sweet Canaan (Camp Meeting 2025)",
+        youtubeUrl: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+        date: "2025-08-14"
+      },
+      {
+        id: "cv2",
+        title: "KARUSDA Voices - Rock of Ages (Sabbath Worship)",
+        youtubeUrl: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+        date: "2026-04-18"
+      }
+    ]
   },
 
   leadership: [
-    { id: "l1", name: "Elder James Karanja", role: "Head Elder", bio: "Serving KARUSDA's eldership for 6 years." },
-    { id: "l2", name: "Sis. Mercy Wanjiru", role: "Deaconess Coordinator", bio: "Oversees hospitality and welfare." },
-    { id: "l3", name: "Bro. Peter Njoroge", role: "Youth Director", bio: "Leads campus evangelism and AY programs." },
+    {
+      id: "l1",
+      name: "Elder James Karanja",
+      role: "Head Elder",
+      bio: "Serving KARUSDA's eldership for 6 years.",
+      photo: "https://picsum.photos/seed/jamesk/300/300",
+      photoDesc: "Elder James Karanja in a formal grey suit, smiling."
+    },
+    {
+      id: "l2",
+      name: "Sis. Mercy Wanjiru",
+      role: "Deaconess Coordinator",
+      bio: "Oversees hospitality and welfare.",
+      photo: "https://picsum.photos/seed/mercyw/300/300",
+      photoDesc: "Sis. Mercy Wanjiru in a traditional dress and blue headwrap."
+    },
+    {
+      id: "l3",
+      name: "Bro. Peter Njoroge",
+      role: "Youth Director",
+      bio: "Leads campus evangelism and AY programs.",
+      photo: "https://picsum.photos/seed/petern/300/300",
+      photoDesc: "Bro. Peter Njoroge wearing a church youth t-shirt, standing outdoors."
+    }
+  ],
+
+  sermons: [
+    {
+      id: "sermon-1",
+      title: "The Hour of His Judgment is Come",
+      speaker: "Pr. Silas Obwogi",
+      date: "2026-06-20",
+      scripture: "Revelation 14:6-12",
+      youtubeUrl: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+      description: "A deep dive into the three angels' messages and their relevance to campus students in the end times."
+    },
+    {
+      id: "sermon-2",
+      title: "Resting in Grace",
+      speaker: "Elder James Karanja",
+      date: "2026-06-13",
+      scripture: "Matthew 11:28-30",
+      youtubeUrl: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+      description: "Discovering what it truly means to enter into God's Sabbath rest, letting go of our own burdens."
+    }
   ],
 
   missions: {
@@ -193,11 +249,11 @@ export const initialData = {
   },
 
   contact: {
-    address: "Karatina University, Karatina, Kenya",
-    phone: "+254 700 000 000",
-    email: "karusda@karu.ac.ke",
-    facebook: "facebook.com/karusda",
-    instagram: "instagram.com/karusda",
+    address: "Karatina University, Nyeri, Kenya",
+    email: "karatinauniversitysdachurch@gmail.com",
+    facebook: "https://www.facebook.com/karusda.main?mibextid=rS40aB7S9Ucbxw6v",
+    instagram: "https://www.instagram.com/karusda_2025?igsh=NHg5YmF6ejF3emg0",
+    youtube: "https://www.youtube.com/@UCmFWvxiBFvwYkJbsQ8zdMXg",
   },
 };
 

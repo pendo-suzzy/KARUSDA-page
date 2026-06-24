@@ -1,7 +1,7 @@
 import { createContext, useContext, useEffect, useState, useCallback } from "react";
 import { initialData, ADMIN_CREDENTIALS } from "../data/initialData";
 
-const STORAGE_KEY = "karusda_data_v1";
+const STORAGE_KEY = "karusda_data_v2";
 const SESSION_KEY = "karusda_admin_session";
 
 const AppContext = createContext(null);
@@ -9,7 +9,25 @@ const AppContext = createContext(null);
 function loadData() {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
-    if (raw) return JSON.parse(raw);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      return {
+        ...initialData,
+        ...parsed,
+        choir: {
+          ...initialData.choir,
+          ...(parsed.choir || {})
+        },
+        events: {
+          ...initialData.events,
+          ...(parsed.events || {})
+        },
+        missions: {
+          ...initialData.missions,
+          ...(parsed.missions || {})
+        }
+      };
+    }
   } catch (e) {
     console.warn("Could not read stored data, falling back to seed data.", e);
   }
@@ -120,6 +138,41 @@ export function AppProvider({ children }) {
     setData((prev) => ({ ...prev, choir: { ...prev.choir, ...patch } }));
   }, []);
 
+  const addChoirVideo = useCallback((video) => {
+    setData((prev) => ({
+      ...prev,
+      choir: {
+        ...prev.choir,
+        videos: [...(prev.choir.videos || []), { ...video, id: uid("cv") }],
+      },
+    }));
+  }, []);
+
+  const deleteChoirVideo = useCallback((id) => {
+    setData((prev) => ({
+      ...prev,
+      choir: {
+        ...prev.choir,
+        videos: (prev.choir.videos || []).filter((v) => v.id !== id),
+      },
+    }));
+  }, []);
+
+  // ---- Sermons ----
+  const addSermon = useCallback((sermon) => {
+    setData((prev) => ({
+      ...prev,
+      sermons: [{ ...sermon, id: uid("sermon") }, ...(prev.sermons || [])],
+    }));
+  }, []);
+
+  const deleteSermon = useCallback((id) => {
+    setData((prev) => ({
+      ...prev,
+      sermons: (prev.sermons || []).filter((s) => s.id !== id),
+    }));
+  }, []);
+
   // ---- Leadership ----
   const addLeader = useCallback((leader) => {
     setData((prev) => ({
@@ -182,6 +235,10 @@ export function AppProvider({ children }) {
     deleteGalleryItem,
     updateMinistry,
     updateChoir,
+    addChoirVideo,
+    deleteChoirVideo,
+    addSermon,
+    deleteSermon,
     addLeader,
     deleteLeader,
     addMission,

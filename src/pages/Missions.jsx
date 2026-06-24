@@ -36,26 +36,6 @@ export default function Missions() {
 
       <section className="section">
         <div className="container">
-          <p className="eyebrow">Where we've been</p>
-          <h2 className="section__title">Past missions</h2>
-          <ol className="mission-timeline">
-            {past.map((m) => (
-              <li key={m.id} className="mission-timeline__item">
-                <span className="mission-timeline__year">{m.year}</span>
-                <div>
-                  <h3>{m.title}</h3>
-                  <p>{m.summary}</p>
-                </div>
-              </li>
-            ))}
-          </ol>
-        </div>
-      </section>
-
-      <HorizonArc tone="cream" />
-
-      <section className="section">
-        <div className="container">
           <p className="eyebrow">Where we're headed</p>
           <h2 className="section__title">Upcoming missions</h2>
           <div className="mission-grid">
@@ -77,6 +57,26 @@ export default function Missions() {
               );
             })}
           </div>
+        </div>
+      </section>
+
+      <HorizonArc tone="cream" />
+
+      <section className="section">
+        <div className="container">
+          <p className="eyebrow">Where we've been</p>
+          <h2 className="section__title">Past missions</h2>
+          <ol className="mission-timeline">
+            {past.map((m) => (
+              <li key={m.id} className="mission-timeline__item">
+                <span className="mission-timeline__year">{m.year}</span>
+                <div>
+                  <h3>{m.title}</h3>
+                  <p>{m.summary}</p>
+                </div>
+              </li>
+            ))}
+          </ol>
         </div>
       </section>
 

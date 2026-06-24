@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useApp } from "../context/AppContext";
 import "./Admin.css";
 
-const TABS = ["Announcements", "Events", "Gallery", "Ministries", "Choir", "Leadership"];
+const TABS = ["Announcements", "Events", "Gallery", "Ministries", "Choir", "Leadership", "Sermons", "Missions"];
 
 export default function Admin() {
   const { isAdmin, login, logout } = useApp();
@@ -42,7 +42,6 @@ export default function Admin() {
             </label>
             {error && <p className="admin-login__error">{error}</p>}
             <button type="submit" className="btn btn-solid">Sign in</button>
-            <p className="admin-login__hint">Demo credentials: admin / karusda2026</p>
           </form>
         </div>
       </section>
@@ -81,6 +80,8 @@ export default function Admin() {
           {tab === "Ministries" && <MinistriesAdmin />}
           {tab === "Choir" && <ChoirAdmin />}
           {tab === "Leadership" && <LeadershipAdmin />}
+          {tab === "Sermons" && <SermonsAdmin />}
+          {tab === "Missions" && <MissionsAdmin />}
         </div>
       </div>
     </section>
@@ -252,28 +253,61 @@ function MinistriesAdmin() {
 
 /* ---------------- Choir ---------------- */
 function ChoirAdmin() {
-  const { data, updateChoir } = useApp();
+  const { data, updateChoir, addChoirVideo, deleteChoirVideo } = useApp();
   const { choir } = data;
+  const [videoTitle, setVideoTitle] = useState("");
+  const [youtubeUrl, setYoutubeUrl] = useState("");
+
+  const handleSaveDetails = (e) => {
+    e.preventDefault();
+    const fd = new FormData(e.target);
+    updateChoir({
+      members: Number(fd.get("members")),
+      leadName: fd.get("leadName"),
+      description: fd.get("description"),
+    });
+  };
+
+  const handleAddVideo = (e) => {
+    e.preventDefault();
+    if (!videoTitle || !youtubeUrl) return;
+    addChoirVideo({ title: videoTitle, youtubeUrl });
+    setVideoTitle("");
+    setYoutubeUrl("");
+  };
 
   return (
-    <form
-      className="admin-form"
-      onSubmit={(e) => {
-        e.preventDefault();
-        const fd = new FormData(e.target);
-        updateChoir({
-          members: Number(fd.get("members")),
-          leadName: fd.get("leadName"),
-          description: fd.get("description"),
-        });
-      }}
-    >
-      <h3>Edit choir details</h3>
-      <label>Number of vocalists<input name="members" type="number" defaultValue={choir.members} /></label>
-      <label>Choir lead<input name="leadName" defaultValue={choir.leadName} /></label>
-      <label>Description<textarea name="description" defaultValue={choir.description} rows={3} /></label>
-      <button className="btn btn-solid" type="submit">Save choir details</button>
-    </form>
+    <div className="admin-grid">
+      <form className="admin-form" onSubmit={handleSaveDetails}>
+        <h3>Edit choir details</h3>
+        <label>Number of vocalists<input name="members" type="number" defaultValue={choir.members} /></label>
+        <label>Choir lead<input name="leadName" defaultValue={choir.leadName} /></label>
+        <label>Description<textarea name="description" defaultValue={choir.description} rows={3} /></label>
+        <button className="btn btn-solid" type="submit">Save choir details</button>
+      </form>
+
+      <div>
+        <form className="admin-form" onSubmit={handleAddVideo} style={{ marginBottom: "2rem" }}>
+          <h3>Add choir video</h3>
+          <label>Video Title<input value={videoTitle} onChange={(e) => setVideoTitle(e.target.value)} required /></label>
+          <label>YouTube URL<input value={youtubeUrl} onChange={(e) => setYoutubeUrl(e.target.value)} required placeholder="https://www.youtube.com/watch?v=..." /></label>
+          <button className="btn btn-solid" type="submit">Add video link</button>
+        </form>
+
+        <div className="admin-list">
+          <h3>Current choir videos</h3>
+          {(choir.videos || []).map((v) => (
+            <div className="admin-list__row" key={v.id}>
+              <div>
+                <strong>{v.title}</strong>
+                <p style={{ fontSize: "0.85rem", color: "var(--ink-soft)" }}>{v.youtubeUrl}</p>
+              </div>
+              <button className="admin-delete" onClick={() => deleteChoirVideo(v.id)}>Delete</button>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
   );
 }
 
@@ -283,14 +317,24 @@ function LeadershipAdmin() {
   const [name, setName] = useState("");
   const [role, setRole] = useState("");
   const [bio, setBio] = useState("");
+  const [photo, setPhoto] = useState("");
+  const [photoDesc, setPhotoDesc] = useState("");
 
   const handleAdd = (e) => {
     e.preventDefault();
     if (!name || !role) return;
-    addLeader({ name, role, bio });
+    addLeader({
+      name,
+      role,
+      bio,
+      photo: photo.trim() || "https://picsum.photos/seed/" + Math.floor(Math.random() * 1000) + "/300/300",
+      photoDesc: photoDesc.trim() || `${name} - passport photo`
+    });
     setName("");
     setRole("");
     setBio("");
+    setPhoto("");
+    setPhotoDesc("");
   };
 
   return (
@@ -300,17 +344,157 @@ function LeadershipAdmin() {
         <label>Name<input value={name} onChange={(e) => setName(e.target.value)} required /></label>
         <label>Role<input value={role} onChange={(e) => setRole(e.target.value)} required /></label>
         <label>Bio<textarea value={bio} onChange={(e) => setBio(e.target.value)} rows={2} /></label>
+        <label>Passport Photo URL (Optional)<input value={photo} onChange={(e) => setPhoto(e.target.value)} placeholder="https://example.com/photo.jpg" /></label>
+        <label>Photo Description (Optional)<input value={photoDesc} onChange={(e) => setPhotoDesc(e.target.value)} placeholder="e.g. Elder James in a suit, smiling" /></label>
         <button className="btn btn-solid" type="submit">Add leader</button>
       </form>
 
       <div className="admin-list">
+        <h3>Current leadership</h3>
         {data.leadership.map((l) => (
           <div className="admin-list__row" key={l.id}>
-            <div>
-              <strong>{l.name}</strong> — {l.role}
-              <p>{l.bio}</p>
+            <div style={{ display: "flex", gap: "1rem", alignItems: "center" }}>
+              {l.photo && <img src={l.photo} alt={l.photoDesc} style={{ width: "40px", height: "40px", borderRadius: "50%", objectFit: "cover" }} />}
+              <div>
+                <strong>{l.name}</strong> — {l.role}
+                <p>{l.bio}</p>
+                {l.photoDesc && <small style={{ color: "var(--ink-soft)" }}>Photo: {l.photoDesc}</small>}
+              </div>
             </div>
             <button className="admin-delete" onClick={() => deleteLeader(l.id)}>Delete</button>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+/* ---------------- Sermons ---------------- */
+function SermonsAdmin() {
+  const { data, addSermon, deleteSermon } = useApp();
+  const [title, setTitle] = useState("");
+  const [speaker, setSpeaker] = useState("");
+  const [date, setDate] = useState("");
+  const [scripture, setScripture] = useState("");
+  const [youtubeUrl, setYoutubeUrl] = useState("");
+  const [description, setDescription] = useState("");
+
+  const handleAdd = (e) => {
+    e.preventDefault();
+    if (!title || !speaker || !youtubeUrl) return;
+    addSermon({
+      title,
+      speaker,
+      date: date || new Date().toISOString().slice(0, 10),
+      scripture,
+      youtubeUrl,
+      description
+    });
+    setTitle("");
+    setSpeaker("");
+    setDate("");
+    setScripture("");
+    setYoutubeUrl("");
+    setDescription("");
+  };
+
+  return (
+    <div className="admin-grid">
+      <form className="admin-form" onSubmit={handleAdd}>
+        <h3>Add sermon</h3>
+        <label>Sermon Title<input value={title} onChange={(e) => setTitle(e.target.value)} required /></label>
+        <label>Speaker Name<input value={speaker} onChange={(e) => setSpeaker(e.target.value)} required /></label>
+        <label>Scripture Reference<input value={scripture} onChange={(e) => setScripture(e.target.value)} placeholder="e.g. Titus 2:11-13" /></label>
+        <label>Date<input type="date" value={date} onChange={(e) => setDate(e.target.value)} /></label>
+        <label>YouTube URL<input value={youtubeUrl} onChange={(e) => setYoutubeUrl(e.target.value)} required placeholder="https://www.youtube.com/watch?v=..." /></label>
+        <label>Sermon Description<textarea value={description} onChange={(e) => setDescription(e.target.value)} rows={3} /></label>
+        <button className="btn btn-solid" type="submit">Add sermon</button>
+      </form>
+
+      <div className="admin-list">
+        <h3>Current sermons</h3>
+        {(data.sermons || []).map((s) => (
+          <div className="admin-list__row" key={s.id}>
+            <div>
+              <strong>{s.title}</strong>
+              <p style={{ fontSize: "0.9rem", margin: "0.2rem 0" }}>Speaker: {s.speaker} · Scripture: {s.scripture || "N/A"} · Date: {s.date}</p>
+              <p style={{ fontSize: "0.85rem", color: "var(--ink-soft)" }}>{s.description}</p>
+            </div>
+            <button className="admin-delete" onClick={() => deleteSermon(s.id)}>Delete</button>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+/* ---------------- Missions ---------------- */
+function MissionsAdmin() {
+  const { data, addMission, deleteMission } = useApp();
+  const [category, setCategory] = useState("upcoming");
+  const [form, setForm] = useState({ title: "", year: "", summary: "", goalKes: "", raisedKes: "" });
+
+  const update = (field) => (e) => setForm((f) => ({ ...f, [field]: e.target.value }));
+
+  const handleAdd = (e) => {
+    e.preventDefault();
+    if (!form.title || !form.summary) return;
+    const mission = {
+      title: form.title,
+      year: form.year || new Date().getFullYear().toString(),
+      summary: form.summary,
+    };
+    if (category === "upcoming") {
+      mission.goalKes = Number(form.goalKes) || 0;
+      mission.raisedKes = Number(form.raisedKes) || 0;
+    }
+    addMission(category, mission);
+    setForm({ title: "", year: "", summary: "", goalKes: "", raisedKes: "" });
+  };
+
+  return (
+    <div className="admin-grid">
+      <form className="admin-form" onSubmit={handleAdd}>
+        <h3>Add mission</h3>
+        <label>Category
+          <select value={category} onChange={(e) => setCategory(e.target.value)}>
+            <option value="upcoming">Upcoming</option>
+            <option value="past">Past</option>
+          </select>
+        </label>
+        <label>Title<input value={form.title} onChange={update("title")} required /></label>
+        <label>Year<input value={form.year} onChange={update("year")} placeholder={new Date().getFullYear().toString()} /></label>
+        <label>Summary<textarea value={form.summary} onChange={update("summary")} rows={3} required /></label>
+        {category === "upcoming" && (
+          <>
+            <label>Goal (KES)<input type="number" value={form.goalKes} onChange={update("goalKes")} placeholder="e.g. 350000" /></label>
+            <label>Raised so far (KES)<input type="number" value={form.raisedKes} onChange={update("raisedKes")} placeholder="e.g. 50000" /></label>
+          </>
+        )}
+        <button className="btn btn-solid" type="submit">Add mission</button>
+      </form>
+
+      <div className="admin-list">
+        {["upcoming", "past"].map((kind) => (
+          <div key={kind}>
+            <h3 style={{ textTransform: "capitalize" }}>{kind} missions</h3>
+            {(data.missions[kind] || []).map((m) => (
+              <div className="admin-list__row" key={m.id}>
+                <div>
+                  <strong>{m.title}</strong> <span className="admin-list__meta">({m.year})</span>
+                  <p>{m.summary}</p>
+                  {kind === "upcoming" && m.goalKes > 0 && (
+                    <p style={{ fontSize: "0.85rem", color: "var(--ink-soft)" }}>
+                      KES {(m.raisedKes || 0).toLocaleString()} / {m.goalKes.toLocaleString()} raised
+                    </p>
+                  )}
+                </div>
+                <button className="admin-delete" onClick={() => deleteMission(kind, m.id)}>Delete</button>
+              </div>
+            ))}
+            {(!data.missions[kind] || data.missions[kind].length === 0) && (
+              <p style={{ color: "var(--ink-soft)", fontSize: "0.9rem" }}>No {kind} missions yet.</p>
+            )}
           </div>
         ))}
       </div>

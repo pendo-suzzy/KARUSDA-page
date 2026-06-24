@@ -2,6 +2,13 @@ import { useApp } from "../context/AppContext";
 import HorizonArc from "../components/HorizonArc";
 import "./Ministries.css";
 
+function getYouTubeId(url) {
+  if (!url) return null;
+  const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+  const match = url.match(regExp);
+  return match && match[2].length === 11 ? match[2] : null;
+}
+
 export default function Ministries() {
   const { data } = useApp();
   const { ministries, choir, events } = data;
@@ -89,9 +96,70 @@ export default function Ministries() {
           <div className="choir__stat">
             <span className="choir__stat-value">{choir.members}+</span>
             <span className="choir__stat-label">Vocalists</span>
+            <a
+              href="https://youtube.com/@karatinauniversitysdachurc7370?si=WAdy8bP0FR3V-Y4P"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="choir__yt-link"
+            >
+              <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18" style={{ flexShrink: 0 }}>
+                <path d="M23.498 6.186a2.994 2.994 0 0 0-2.112-2.12C19.505 3.546 12 3.546 12 3.546s-7.505 0-9.386.52A2.994 2.994 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a2.994 2.994 0 0 0 2.112 2.12c1.881.52 9.386.52 9.386.52s7.505 0 9.386-.52a2.994 2.994 0 0 0 2.112-2.12C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" />
+              </svg>
+              Subscribe on YouTube
+            </a>
           </div>
         </div>
       </section>
+
+      {choir.videos && choir.videos.length > 0 && (
+        <>
+          <HorizonArc tone="cream" />
+          <section className="section choir-videos" id="choir-videos">
+            <div className="container">
+              <p className="eyebrow">Our Music Ministry</p>
+              <h2 className="section__title">Featured Video Performances</h2>
+              <p className="section__intro" style={{ color: "var(--ink-soft)" }}>
+                Watch and listen to the KARUSDA Grand Choir leading worship and singing praises.
+              </p>
+              <div className="choir-videos__grid">
+                {choir.videos.map((v) => {
+                  const vid = getYouTubeId(v.youtubeUrl);
+                  return (
+                    <a
+                      key={v.id}
+                      href={v.youtubeUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="choir-video-card"
+                    >
+                      <div className="choir-video-card__thumb-wrap">
+                        {vid ? (
+                          <img
+                            src={`https://img.youtube.com/vi/${vid}/0.jpg`}
+                            alt={v.title}
+                            className="choir-video-card__thumb"
+                          />
+                        ) : (
+                          <div className="choir-video-card__thumb-placeholder">YouTube Video</div>
+                        )}
+                        <div className="choir-video-card__play-btn">
+                          <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
+                            <path d="M8 5v14l11-7z" />
+                          </svg>
+                        </div>
+                      </div>
+                      <div className="choir-video-card__info">
+                        <h3 className="choir-video-card__title">{v.title}</h3>
+                        {v.date && <span className="choir-video-card__date">{v.date}</span>}
+                      </div>
+                    </a>
+                  );
+                })}
+              </div>
+            </div>
+          </section>
+        </>
+      )}
     </>
   );
 }
