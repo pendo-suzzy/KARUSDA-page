@@ -257,8 +257,3 @@ export const initialData = {
   },
 };
 
-// NOTE: demo credentials only — replace with real auth before production use.
-export const ADMIN_CREDENTIALS = {
-  username: "admin",
-  password: "karusda2026",
-};
