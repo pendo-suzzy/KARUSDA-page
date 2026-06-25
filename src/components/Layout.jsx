@@ -1,20 +1,15 @@
 import { Outlet } from "react-router-dom";
+import Navbar from "./Navbar";
+import Footer from "./Footer";
 
 export default function Layout() {
   return (
-    <div>
-      <header>
-        <nav>
-          {/* Add navigation here */}
-          <h1>KARUSDA</h1>
-        </nav>
-      </header>
+    <div className="app-shell">
+      <Navbar />
       <main>
         <Outlet />
       </main>
-      <footer>
-        <p>&copy; 2024 KARUSDA</p>
-      </footer>
+      <Footer />
     </div>
   );
 }

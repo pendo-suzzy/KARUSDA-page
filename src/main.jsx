@@ -7,7 +7,13 @@ import "./index.css";
 
 createRoot(document.getElementById("root")).render(
   <React.StrictMode>
-    <BrowserRouter basename={import.meta.env.PROD ? "/KARUSDA-page/" : "/"}>
+    <BrowserRouter
+      basename={import.meta.env.PROD ? "/KARUSDA-page/" : "/"}
+      future={{
+        v7_startTransition: true,
+        v7_relativeSplatPath: true,
+      }}
+    >
       <AppProvider>
         <App />
       </AppProvider>

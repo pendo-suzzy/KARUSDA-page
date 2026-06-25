@@ -1,15 +1,96 @@
-/* Design tokens */
+/* Global design tokens and base styles */
 :root {
   --color-primary: #1c1810;
   --color-secondary: #fff;
-  --font-primary: "Fraunces", serif;
-  --font-secondary: "Inter", sans-serif;
+
+  --paper: #fffcf4;
+  --cream: #f6f1e4;
+  --ink: #1c1810;
+  --ink-soft: #5f5a4d;
+  --clay: #8f5a3c;
+  --gold: #c2a056;
+  --gold-soft: #d9bb72;
+  --highland: #3d6b4f;
+  --highland-soft: #dfe8de;
+  --line: #e6dfca;
+
+  --radius: 20px;
+  --space-1: 0.5rem;
+  --space-2: 0.75rem;
+  --space-3: 1.25rem;
+  --space-4: 2rem;
+  --space-5: 3rem;
+  --space-6: 4rem;
+
+  --font-display: "Fraunces", serif;
+  --font-body: "Inter", sans-serif;
+  --font-mono: "Space Mono", monospace;
+
+  color-scheme: light;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
 }
 
 body {
-  font-family: var(--font-secondary);
-  background-color: var(--color-secondary);
-  color: var(--color-primary);
+  font-family: var(--font-body);
+  background-color: var(--paper);
+  color: var(--ink);
   margin: 0;
   padding: 0;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+#root {
+  min-height: 100vh;
+}
+
+img {
+  display: block;
+  max-width: 100%;
+}
+
+a {
+  color: inherit;
+}
+
+button,
+input,
+textarea {
+  font: inherit;
+}
+
+.container {
+  width: min(1120px, calc(100% - 2rem));
+  margin: 0 auto;
+}
+
+.app-shell {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+main {
+  flex: 1;
+}
+
+.section {
+  padding: var(--space-6) 0;
+}
+
+.eyebrow {
+  font-family: var(--font-mono);
+  font-size: 0.74rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--clay);
+  margin: 0 0 0.35rem;
 }

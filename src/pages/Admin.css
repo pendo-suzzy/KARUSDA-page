@@ -156,6 +156,34 @@
   margin-bottom: var(--space-2);
 }
 
+.admin-overview {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: var(--space-2);
+  margin-bottom: var(--space-2);
+}
+
+.admin-overview__item {
+  background: var(--cream);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 0.8rem 0.9rem;
+}
+
+.admin-overview__value {
+  font-family: var(--font-display);
+  font-size: 1.2rem;
+  color: var(--ink);
+}
+
+.admin-overview__label {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--clay);
+}
+
 .admin-list {
   display: flex;
   flex-direction: column;

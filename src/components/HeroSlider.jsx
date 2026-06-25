@@ -21,9 +21,9 @@ const SLIDES = [
     caption: "Fear God and give Him glory",
   },
   {
-    type: "video",
-    src: "/videos/hero-worship.mp4",
-    poster: "/hero-1.jpg",
+    type: "image",
+    src: "/hero-bg.jpg",
+    alt: "KARUSDA church gathering in the evening",
     caption: "Come as you are — rest is sacred here",
   },
 ];
