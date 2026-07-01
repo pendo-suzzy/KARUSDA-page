@@ -28,7 +28,7 @@ const SLIDES = [
   },
 ];
 
-const INTERVAL = 4000;
+const INTERVAL = 7000;
 
 export default function HeroSlider({ children }) {
   const [active, setActive] = useState(0);

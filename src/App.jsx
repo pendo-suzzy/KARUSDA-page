@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import { Routes, Route } from "react-router-dom";
 import Layout from "./components/Layout";
 import Home from "./pages/Home";
@@ -5,8 +6,26 @@ import Events from "./pages/Events";
 import Ministries from "./pages/Ministries";
 import Missions from "./pages/Missions";
 import Admin from "./pages/Admin";
+import { supabase } from "./lib/supabaseClient";
 
 export default function App() {
+  const [notes, setNotes] = useState([]);
+
+  useEffect(() => {
+    const fetchNotes = async () => {
+      let { data: notes, error } = await supabase
+        .from('notes')
+        .select('*');
+      if (error) {
+        console.log('error', error);
+      } else {
+        setNotes(notes);
+      } 
+    };
+    
+    fetchNotes();
+  }, []);
+
   return (
     <Routes>
       <Route element={<Layout />}>

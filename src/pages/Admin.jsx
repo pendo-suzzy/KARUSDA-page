@@ -1,5 +1,6 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { useApp } from "../context/AppContext";
+import { supabase } from "../lib/supabaseClient";
 import "./Admin.css";
 
 export default function Admin() {
@@ -20,6 +21,47 @@ export default function Admin() {
   const [editingLeaderId, setEditingLeaderId] = useState(null);
   const [editingSermonId, setEditingSermonId] = useState(null);
   const [editingGalleryId, setEditingGalleryId] = useState(null);
+
+  const [session, setSession] = useState(null);
+  const [authEmail, setAuthEmail] = useState("");
+  const [authPassword, setAuthPassword] = useState("");
+  const [isSignUp, setIsSignUp] = useState(false);
+  const [authLoading, setAuthLoading] = useState(false);
+  const [authError, setAuthError] = useState(null);
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+    });
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  const handleAuth = async (e) => {
+    e.preventDefault();
+    setAuthLoading(true);
+    setAuthError(null);
+    let error;
+    if (isSignUp) {
+      const res = await supabase.auth.signUp({ email: authEmail, password: authPassword });
+      error = res.error;
+    } else {
+      const res = await supabase.auth.signInWithPassword({ email: authEmail, password: authPassword });
+      error = res.error;
+    }
+    if (error) setAuthError(error.message);
+    setAuthLoading(false);
+  };
+
+  const handleSignOut = async () => {
+    await supabase.auth.signOut();
+  };
 
   const saveAnnouncement = (event) => {
     event.preventDefault();
@@ -437,15 +479,45 @@ export default function Admin() {
     sermons: data.sermons?.length || 0,
   }), [data]);
 
+  if (!session) {
+    return (
+      <div className="section" style={{ minHeight: "60vh", display: "flex", justifyContent: "center", alignItems: "center" }}>
+        <div className="container" style={{ maxWidth: "400px" }}>
+          <h2 style={{ textAlign: "center", marginBottom: "1rem" }}>{isSignUp ? "Sign Up" : "Admin Login"}</h2>
+          {authError && <p style={{ color: "red", textAlign: "center", marginBottom: "1rem" }}>{authError}</p>}
+          <form className="admin-form" onSubmit={handleAuth}>
+            <label>
+              Email
+              <input type="email" value={authEmail} onChange={(e) => setAuthEmail(e.target.value)} required />
+            </label>
+            <label>
+              Password
+              <input type="password" value={authPassword} onChange={(e) => setAuthPassword(e.target.value)} required />
+            </label>
+            <button className="footer__submit-btn" type="submit" disabled={authLoading}>
+              {authLoading ? "Loading..." : isSignUp ? "Sign Up" : "Login"}
+            </button>
+            <p style={{ textAlign: "center", marginTop: "1rem", cursor: "pointer", color: "var(--color-primary)" }} onClick={() => setIsSignUp(!isSignUp)}>
+              {isSignUp ? "Already have an account? Login" : "Need an account? Sign Up"}
+            </p>
+          </form>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="section">
       <div className="container">
-        <div className="admin-panel__header">
+        <div className="admin-panel__header" style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
           <div>
             <p className="eyebrow">Administration</p>
             <h1 className="admin-panel__title">Content dashboard</h1>
           </div>
-          <p className="admin-login__hint">Admin dashboard</p>
+          <div style={{ textAlign: "right" }}>
+            <p className="admin-login__hint">Admin dashboard</p>
+            <button onClick={handleSignOut} className="footer__submit-btn" style={{ marginTop: "0.5rem", padding: "0.5rem 1rem" }}>Sign Out</button>
+          </div>
         </div>
 
         <div className="admin-tabs">
