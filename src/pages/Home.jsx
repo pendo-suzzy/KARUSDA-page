@@ -25,6 +25,9 @@ export default function Home() {
             <Link to="/ministries" className="button button--secondary">
               Explore ministries
             </Link>
+            <a href="#announcements" className="button button--secondary" style={{ backgroundColor: 'rgba(255,255,255,0.1)' }}>
+              Read announcements
+            </a>
           </div>
         </div>
       </HeroSlider>
@@ -52,7 +55,7 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="section">
+      <section id="announcements" className="section">
         <div className="container">
           <h2 className="section__title">Latest announcements</h2>
           <p className="section__intro">

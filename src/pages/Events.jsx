@@ -95,13 +95,15 @@ export default function Events() {
 
       <section className="section gallery">
         <div className="container">
-          <h2 className="section__title" style={{ color: "var(--paper)" }}>Moments from the church</h2>
-          <div className="gallery__grid">
-            {gallery.slice(0, 8).map((image) => (
-              <figure key={image.id} className="gallery__item">
-                <img src={image.src} alt={image.caption} />
-                <figcaption>{image.caption}</figcaption>
-              </figure>
+          <h2 className="section__title" style={{ color: "var(--paper)" }}>Gallery</h2>
+          <div className="gallery__links-list">
+            {gallery.map((image) => (
+              <a key={image.id} href={image.src} target="_blank" rel="noopener noreferrer" className="wa-link-card">
+                <div className="wa-link-card__body">
+                  <h4 className="wa-link-card__title">{image.caption}</h4>
+                  <p className="wa-link-card__url">{image.src}</p>
+                </div>
+              </a>
             ))}
           </div>
         </div>
