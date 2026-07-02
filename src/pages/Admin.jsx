@@ -51,6 +51,13 @@ export default function Admin() {
     if (isSignUp) {
       const res = await supabase.auth.signUp({ email: authEmail, password: authPassword });
       error = res.error;
+      
+      // If sign up succeeds but requires email confirmation, session will be null
+      if (!error && res.data && !res.data.session) {
+        setAuthError("Sign up successful! Please check your email to confirm your account.");
+        setAuthLoading(false);
+        return;
+      }
     } else {
       const res = await supabase.auth.signInWithPassword({ email: authEmail, password: authPassword });
       error = res.error;
@@ -72,11 +79,11 @@ export default function Admin() {
           ...current,
           announcements: (current.announcements || []).map((item) => (item.id === editingAnnouncementId
             ? {
-                ...item,
-                title: announcementDraft.title,
-                body: announcementDraft.body,
-                date: announcementDraft.date || item.date,
-              }
+              ...item,
+              title: announcementDraft.title,
+              body: announcementDraft.body,
+              date: announcementDraft.date || item.date,
+            }
             : item)),
         };
       }
@@ -121,13 +128,13 @@ export default function Admin() {
             ...current.missions,
             upcoming: (current.missions?.upcoming || []).map((item) => (item.id === editingMissionId
               ? {
-                  ...item,
-                  title: missionDraft.title,
-                  year: missionDraft.year || item.year,
-                  summary: missionDraft.summary,
-                  goalKes: Number(missionDraft.goalKes || item.goalKes || 0),
-                  raisedKes: Number(missionDraft.raisedKes || item.raisedKes || 0),
-                }
+                ...item,
+                title: missionDraft.title,
+                year: missionDraft.year || item.year,
+                summary: missionDraft.summary,
+                goalKes: Number(missionDraft.goalKes || item.goalKes || 0),
+                raisedKes: Number(missionDraft.raisedKes || item.raisedKes || 0),
+              }
               : item)),
           },
         };
@@ -277,13 +284,13 @@ export default function Admin() {
           ...current,
           ministries: (current.ministries || []).map((item) => (item.id === editingMinistryId
             ? {
-                ...item,
-                name: ministryDraft.name,
-                tagline: ministryDraft.tagline,
-                description: ministryDraft.description,
-                meetingDay: ministryDraft.meetingDay,
-                meetingTime: ministryDraft.meetingTime,
-              }
+              ...item,
+              name: ministryDraft.name,
+              tagline: ministryDraft.tagline,
+              description: ministryDraft.description,
+              meetingDay: ministryDraft.meetingDay,
+              meetingTime: ministryDraft.meetingTime,
+            }
             : item)),
         };
       }
@@ -327,13 +334,13 @@ export default function Admin() {
           ...current,
           leadership: (current.leadership || []).map((item) => (item.id === editingLeaderId
             ? {
-                ...item,
-                name: leaderDraft.name,
-                role: leaderDraft.role,
-                bio: leaderDraft.bio,
-                photo: leaderDraft.photo || item.photo || "https://picsum.photos/seed/leader/300/300",
-                photoDesc: `${leaderDraft.name} portrait`,
-              }
+              ...item,
+              name: leaderDraft.name,
+              role: leaderDraft.role,
+              bio: leaderDraft.bio,
+              photo: leaderDraft.photo || item.photo || "https://picsum.photos/seed/leader/300/300",
+              photoDesc: `${leaderDraft.name} portrait`,
+            }
             : item)),
         };
       }
@@ -377,14 +384,14 @@ export default function Admin() {
           ...current,
           sermons: (current.sermons || []).map((item) => (item.id === editingSermonId
             ? {
-                ...item,
-                title: sermonDraft.title,
-                speaker: sermonDraft.speaker,
-                date: sermonDraft.date,
-                scripture: sermonDraft.scripture,
-                youtubeUrl: sermonDraft.youtubeUrl,
-                description: sermonDraft.description,
-              }
+              ...item,
+              title: sermonDraft.title,
+              speaker: sermonDraft.speaker,
+              date: sermonDraft.date,
+              scripture: sermonDraft.scripture,
+              youtubeUrl: sermonDraft.youtubeUrl,
+              description: sermonDraft.description,
+            }
             : item)),
         };
       }
@@ -429,21 +436,21 @@ export default function Admin() {
       const nextVideos = choirVideoDraft.id
         ? existingVideos.map((video) => (video.id === choirVideoDraft.id
           ? {
-              ...video,
-              title: choirVideoDraft.title || video.title,
-              youtubeUrl: choirVideoDraft.youtubeUrl || video.youtubeUrl,
-              date: choirVideoDraft.date || video.date,
-            }
+            ...video,
+            title: choirVideoDraft.title || video.title,
+            youtubeUrl: choirVideoDraft.youtubeUrl || video.youtubeUrl,
+            date: choirVideoDraft.date || video.date,
+          }
           : video))
         : [
-            {
-              id: `cv-${Date.now()}`,
-              title: choirVideoDraft.title,
-              youtubeUrl: choirVideoDraft.youtubeUrl,
-              date: choirVideoDraft.date,
-            },
-            ...existingVideos,
-          ];
+          {
+            id: `cv-${Date.now()}`,
+            title: choirVideoDraft.title,
+            youtubeUrl: choirVideoDraft.youtubeUrl,
+            date: choirVideoDraft.date,
+          },
+          ...existingVideos,
+        ];
 
       return {
         ...current,
