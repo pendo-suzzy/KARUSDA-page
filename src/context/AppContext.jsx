@@ -46,72 +46,86 @@ const buildItemPayload = (item, table) => {
   return common;
 };
 
-const buildDataFromRows = (rows) => {
+const TABLE_NAMES = [
+  "announcements",
+  "events",
+  "gallery",
+  "leadership",
+  "ministries",
+  "choir",
+  "missions",
+  "sermon",
+];
+
+const normalizeTableName = (tableName) => {
+  if (tableName === "sermons") return "sermon";
+  if (tableName === "choir_videos") return "choir";
+  return tableName;
+};
+
+const buildDataFromRows = ({ announcements, events, gallery, leadership, ministries, choir, missions, sermon }) => {
   const data = { ...DEFAULT_DATA };
 
-  rows.forEach((row) => {
-    switch (row.table_name) {
-      case "announcements":
-        data.announcements.push(row.payload);
-        break;
-      case "gallery":
-        data.gallery.push(row.payload);
-        break;
-      case "ministries":
-        data.ministries.push(row.payload);
-        break;
-      case "leadership":
-        data.leadership.push(row.payload);
-        break;
-      case "sermons":
-        data.sermons.push(row.payload);
-        break;
-      case "choir_videos":
-        data.choir.videos.push(row.payload);
-        break;
-      case "missions":
-        if (row.payload.upcoming) {
-          data.missions.upcoming.push(row.payload);
-        } else {
-          data.missions.past.push(row.payload);
-        }
-        break;
-      case "events":
-        data.events[row.payload.category] = [
-          ...(data.events[row.payload.category] || []),
-          row.payload,
-        ];
-        break;
-      case "stats":
-        data.stats = row.payload;
-        break;
-      case "contact":
-        data.contact = row.payload;
-        break;
-      default:
-        break;
+  data.announcements = announcements || [];
+  data.gallery = gallery || [];
+  data.ministries = ministries || [];
+  data.leadership = leadership || [];
+  data.sermons = sermon || [];
+  data.choir = {
+    ...data.choir,
+    videos: choir || [],
+  };
+
+  data.events = {
+    services: [],
+    gatherings: [],
+    volunteer: [],
+  };
+  (events || []).forEach((event) => {
+    const category = event.category || "services";
+    data.events[category] = [...(data.events[category] || []), event];
+  });
+
+  data.missions = {
+    past: [],
+    upcoming: [],
+  };
+  (missions || []).forEach((mission) => {
+    if (mission.upcoming === false) {
+      data.missions.past.push(mission);
+    } else {
+      data.missions.upcoming.push(mission);
     }
   });
 
   return data;
 };
 
-const fetchAppData = async () => {
-  const { data: rows, error } = await supabase
-    .from("app_data")
-    .select("table_name, payload");
+const fetchTable = async (table) => {
+  const { data, error } = await supabase
+    .from(table)
+    .select("*");
 
   if (error) {
     throw error;
   }
 
-  return buildDataFromRows(rows || []);
+  return data || [];
 };
 
-const upsertRow = async ({ table_name, id, payload }) => {
+const fetchAppData = async () => {
+  const [announcements, events, gallery, leadership, ministries, choir, missions, sermon] = await Promise.all(
+    TABLE_NAMES.map(fetchTable)
+  );
+
+  return buildDataFromRows({ announcements, events, gallery, leadership, ministries, choir, missions, sermon });
+};
+
+const upsertRow = async ({ table_name, item }) => {
+  const table = normalizeTableName(table_name);
   const { data, error } = await supabase
-    .from("app_data")
-    .upsert({ table_name, id, payload }, { onConflict: ["table_name", "id"] });
+    .from(table)
+    .upsert(item, { onConflict: ["id"] });
 
   if (error) {
     throw error;
@@ -121,10 +135,10 @@ const upsertRow = async ({ table_name, id, payload }) => {
 };
 
 const deleteRow = async ({ table_name, id }) => {
+  const table = normalizeTableName(table_name);
   const { error } = await supabase
-    .from("app_data")
+    .from(table)
     .delete()
-    .eq("table_name", table_name)
     .eq("id", id);
 
   if (error) {
@@ -152,11 +166,12 @@ export const AppProvider = ({ children }) => {
     };
 
     load();
-    const realtimeChannel = supabase
-      .channel("public:app_data")
-      .on(
+
+    const realtimeChannel = supabase.channel("public:supabase-data");
+    TABLE_NAMES.forEach((table) => {
+      realtimeChannel.on(
         "postgres_changes",
-        { event: "*", schema: "public", table: "app_data" },
+        { event: "*", schema: "public", table },
         async () => {
           try {
             const fetched = await fetchAppData();
@@ -165,19 +180,17 @@ export const AppProvider = ({ children }) => {
             console.error("Supabase realtime refresh failed:", err);
           }
         }
-      )
-      .subscribe();
+      );
+    });
+    realtimeChannel.subscribe();
+
+    return () => {
+      realtimeChannel.unsubscribe();
+    };
   }, []);
 
   const syncItem = async ({ table_name, item }) => {
-    const payload = buildItemPayload(item, table_name);
-    const row = {
-      table_name,
-      id: item.id,
-      payload,
-    };
-
-    await upsertRow(row);
+    await upsertRow({ table_name, item });
   };
 
   const removeItem = async ({ table_name, id }) => {

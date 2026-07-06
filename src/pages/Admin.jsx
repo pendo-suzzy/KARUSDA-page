@@ -491,7 +491,7 @@ export default function Admin() {
         },
       };
     });
-    await persistItem({ table: "choir_videos", item: video });
+    await persistItem({ table: "choir", item: video });
     setChoirVideoDraft({ id: "", title: "", youtubeUrl: "", date: "" });
   };
 
@@ -503,7 +503,7 @@ export default function Admin() {
         videos: (current.choir?.videos || []).filter((video) => video.id !== videoId),
       },
     }));
-    removePersistedItem({ table: "choir_videos", id: videoId });
+    removePersistedItem({ table: "choir", id: videoId });
     if (choirVideoDraft.id === videoId) {
       setChoirVideoDraft({ id: "", title: "", youtubeUrl: "", date: "" });
     }
