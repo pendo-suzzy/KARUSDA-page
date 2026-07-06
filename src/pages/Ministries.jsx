@@ -80,8 +80,8 @@ export default function Ministries() {
               <span className="choir__stat-label">Members</span>
             </div>
           </div>
-          <a className="choir__yt-link" href={choir.videos?.[0]?.youtubeUrl} target="_blank" rel="noreferrer">
-            ▶ Watch a recent choir recording
+          <a className="choir__yt-link" href="https://www.youtube.com/channel/UCmFWvxiBFvwYkJbsQ8zdMXg" target="_blank" rel="noreferrer">
+            Youtube Chanel
           </a>
         </div>
       </section>

@@ -32,9 +32,14 @@ export default function Home() {
             <Link to="/events" className="button button--primary">
               View upcoming events
             </Link>
-            <Link to="/ministries" className="button button--secondary">
-              Explore ministries
-            </Link>
+            <a
+              href="https://www.youtube.com/channel/UCmFWvxiBFvwYkJbsQ8zdMXg"
+              target="_blank"
+              rel="noreferrer"
+              className="button button--secondary"
+            >
+              UCmFWvxiBFvwYkJbsQ8zdMXg
+            </a>
             <a href="#announcements" className="button button--secondary" style={{ backgroundColor: 'rgba(255,255,255,0.1)' }}>
               Read announcements
             </a>

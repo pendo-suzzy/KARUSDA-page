@@ -125,7 +125,7 @@
 
 /* === Weekly Schedule === */
 .week-schedule {
-  background: linear-gradient(135deg, #1a1510 0%, #2a1f12 50%, #1c1810 100%);
+  background: linear-gradient(135deg, #1a1510 0%, #2a1f12 45%, #1c1810 100%);
   padding: var(--space-5) 0;
   position: relative;
   overflow: hidden;
@@ -136,6 +136,18 @@
   position: absolute;
   inset: 0;
   background: radial-gradient(ellipse at 30% 50%, rgba(194, 160, 86, 0.08) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.week-schedule::after {
+  content: '';
+  position: absolute;
+  right: -60px;
+  bottom: -40px;
+  width: 280px;
+  height: 280px;
+  background: radial-gradient(circle at center, rgba(255,255,255,0.09), transparent 65%);
+  filter: blur(18px);
   pointer-events: none;
 }
 
@@ -153,21 +165,23 @@
   font-size: clamp(1.4rem, 3vw, 2rem);
   color: var(--paper);
   margin: 0 0 var(--space-4);
+  max-width: 52ch;
 }
 
 .week-schedule__timeline {
   display: grid;
-  grid-template-columns: repeat(7, 1fr);
+  grid-template-columns: repeat(7, minmax(0, 1fr));
   gap: 1rem;
   position: relative;
+  padding: 0 0.15rem;
 }
 
 .week-schedule__timeline::before {
   content: '';
   position: absolute;
-  top: 36px;
-  left: calc(100% / 12);
-  right: calc(100% / 12);
+  top: calc(1.5rem + 8px);
+  left: 1rem;
+  right: 1rem;
   height: 2px;
   background: linear-gradient(90deg, transparent, rgba(194,160,86,0.4), transparent);
   z-index: 0;
@@ -178,9 +192,25 @@
   flex-direction: column;
   align-items: center;
   text-align: center;
-  gap: 0.5rem;
+  gap: 0.75rem;
   position: relative;
   z-index: 1;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 24px;
+  padding: 1rem 0.9rem;
+  backdrop-filter: blur(6px);
+  box-shadow: 0 20px 40px rgba(0,0,0,0.18);
+  transition: transform 0.25s ease, border-color 0.25s ease;
+}
+
+.week-day-card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(194,160,86,0.45);
+}
+
+.week-day-card:nth-child(even) {
+  transform: translateY(8px);
 }
 
 .week-day-card__day {
@@ -189,35 +219,39 @@
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: rgba(255, 252, 244, 0.6);
-  margin-bottom: 0.2rem;
+  color: rgba(255, 252, 244, 0.8);
+  margin-bottom: 0.1rem;
 }
 
 .week-day-card__dot {
-  width: 14px;
-  height: 14px;
+  width: 16px;
+  height: 16px;
   border-radius: 50%;
   background: var(--day-color, var(--gold));
-  box-shadow: 0 0 0 4px rgba(255,255,255,0.06), 0 0 12px var(--day-color, var(--gold));
+  box-shadow: 0 0 0 4px rgba(255,255,255,0.06), 0 0 18px var(--day-color, var(--gold));
   flex-shrink: 0;
 }
 
 .week-day-card__info {
   display: flex;
   flex-direction: column;
-  gap: 0.2rem;
+  gap: 0.3rem;
+  width: 100%;
+  padding: 0.85rem 0.8rem;
+  border-radius: 18px;
+  background: rgba(255,255,255,0.05);
 }
 
 .week-day-card__label {
-  font-size: 0.82rem;
-  font-weight: 600;
+  font-size: 0.92rem;
+  font-weight: 700;
   color: var(--paper);
   line-height: 1.3;
 }
 
 .week-day-card__time {
   font-family: var(--font-mono);
-  font-size: 0.72rem;
+  font-size: 0.82rem;
   color: var(--day-color, var(--gold));
 }
 
@@ -340,8 +374,47 @@
   .week-schedule__timeline {
     grid-template-columns: repeat(3, 1fr);
   }
+  .week-day-card:nth-child(even) {
+    transform: translateY(0);
+  }
+  .week-day-card {
+    box-shadow: 0 14px 28px rgba(0,0,0,0.16);
+  }
   .week-schedule__timeline::before {
     display: none;
+  }
+}
+
+@media (max-width: 680px) {
+  .hero__actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .hero__actions .button {
+    width: 100%;
+  }
+  .week-schedule__timeline {
+    grid-template-columns: 1fr;
+  }
+  .week-day-card {
+    flex-direction: row;
+    align-items: center;
+    text-align: left;
+    gap: 1rem;
+    padding: 1rem;
+  }
+  .week-day-card__info {
+    padding: 0.75rem 0.8rem;
+  }
+  .week-day-card__label {
+    font-size: 0.95rem;
+  }
+  .week-day-card__time {
+    font-size: 0.85rem;
+  }
+  .week-day-card__dot {
+    width: 18px;
+    height: 18px;
   }
 }
 
@@ -350,7 +423,13 @@
     min-height: 100vh;
   }
   .week-schedule__timeline {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: 1fr;
+  }
+  .week-day-card {
+    padding: 0.9rem;
+  }
+  .week-schedule__title {
+    font-size: 1.6rem;
   }
 }
 

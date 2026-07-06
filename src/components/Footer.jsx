@@ -124,8 +124,16 @@ export default function Footer() {
             <a href="https://www.facebook.com/karusda.main?mibextid=rS40aB7S9Ucbxw6v" target="_blank" rel="noopener noreferrer" aria-label="Follow us on Facebook" title="Follow us on Facebook" className="footer__social-link footer__social-link--facebook">
               <IconFacebook />
             </a>
-            <a href="https://www.youtube.com/@UCmFWvxiBFvwYkJbsQ8zdMXg" target="_blank" rel="noopener noreferrer" aria-label="Subscribe on YouTube" title="Subscribe on YouTube" className="footer__social-link footer__social-link--youtube">
+            <a
+              href="https://www.youtube.com/channel/UCmFWvxiBFvwYkJbsQ8zdMXg"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="YouTube channel UCmFWvxiBFvwYkJbsQ8zdMXg"
+              title="YouTube channel UCmFWvxiBFvwYkJbsQ8zdMXg"
+              className="footer__social-link footer__social-link--youtube footer__social-link--youtube-text"
+            >
               <IconYouTube />
+              <span className="footer__social-label">UCmFWvxiBFvwYkJbsQ8zdMXg</span>
             </a>
           </div>
         </div>
