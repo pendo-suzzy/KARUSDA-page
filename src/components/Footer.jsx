@@ -128,12 +128,11 @@ export default function Footer() {
               href="https://www.youtube.com/channel/UCmFWvxiBFvwYkJbsQ8zdMXg"
               target="_blank"
               rel="noopener noreferrer"
-              aria-label="YouTube channel UCmFWvxiBFvwYkJbsQ8zdMXg"
-              title="YouTube channel UCmFWvxiBFvwYkJbsQ8zdMXg"
-              className="footer__social-link footer__social-link--youtube footer__social-link--youtube-text"
+              aria-label="YouTube channel"
+              title="YouTube channel"
+              className="footer__social-link footer__social-link--youtube"
             >
               <IconYouTube />
-              <span className="footer__social-label">UCmFWvxiBFvwYkJbsQ8zdMXg</span>
             </a>
           </div>
         </div>

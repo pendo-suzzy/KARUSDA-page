@@ -100,20 +100,6 @@
   color: #fff;
 }
 
-.footer__social-link--youtube-text {
-  min-width: 220px;
-  padding: 0 0.85rem;
-  justify-content: center;
-}
-
-.footer__social-label {
-  margin-left: 0.55rem;
-  font-size: 0.78rem;
-  line-height: 1.2;
-  letter-spacing: 0.02em;
-  font-family: var(--font-mono);
-}
-
 .footer__icon-svg {
   width: 20px;
   height: 20px;
