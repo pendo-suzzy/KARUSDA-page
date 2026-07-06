@@ -38,7 +38,7 @@ export default function Home() {
               rel="noreferrer"
               className="button button--secondary"
             >
-              UCmFWvxiBFvwYkJbsQ8zdMXg
+              Youtube Chanel
             </a>
             <a href="#announcements" className="button button--secondary" style={{ backgroundColor: 'rgba(255,255,255,0.1)' }}>
               Read announcements
