@@ -5,7 +5,7 @@ import Events from "./pages/Events";
 import Ministries from "./pages/Ministries";
 import Missions from "./pages/Missions";
 import Admin from "./pages/Admin";
-import { supabase } from "./lib/supabaseClient";
+// import { supabase } from "./lib/supabaseClient";
 
 export default function App() {
   return (

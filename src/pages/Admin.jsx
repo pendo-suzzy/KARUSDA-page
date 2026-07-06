@@ -4,7 +4,7 @@ import { supabase } from "../lib/supabaseClient";
 import "./Admin.css";
 
 export default function Admin() {
-  const { data, setData } = useApp();
+  const { data, setData, syncItem, removeItem, getUniqueId } = useApp();
   const [activeTab, setActiveTab] = useState("announcements");
   const [announcementDraft, setAnnouncementDraft] = useState({ title: "", body: "", date: "" });
   const [missionDraft, setMissionDraft] = useState({ title: "", year: "", summary: "", goalKes: "", raisedKes: "" });
@@ -70,9 +70,32 @@ export default function Admin() {
     await supabase.auth.signOut();
   };
 
-  const saveAnnouncement = (event) => {
+  const persistItem = async ({ table, item }) => {
+    try {
+      await syncItem({ table_name: table, item });
+    } catch (err) {
+      console.error(`Failed to persist ${table}:`, err);
+    }
+  };
+
+  const removePersistedItem = async ({ table, id }) => {
+    try {
+      await removeItem({ table_name: table, id });
+    } catch (err) {
+      console.error(`Failed to delete persisted ${table} row:`, err);
+    }
+  };
+
+  const saveAnnouncement = async (event) => {
     event.preventDefault();
     if (!announcementDraft.title || !announcementDraft.body) return;
+    const announcement = {
+      id: editingAnnouncementId || `a-${Date.now()}`,
+      title: announcementDraft.title,
+      body: announcementDraft.body,
+      date: announcementDraft.date || new Date().toISOString(),
+      likes: 0,
+    };
     setData((current) => {
       if (editingAnnouncementId) {
         return {
@@ -91,17 +114,12 @@ export default function Admin() {
       return {
         ...current,
         announcements: [
-          {
-            id: `a-${Date.now()}`,
-            title: announcementDraft.title,
-            body: announcementDraft.body,
-            date: announcementDraft.date || new Date().toISOString(),
-            likes: 0,
-          },
+          announcement,
           ...(current.announcements || []),
         ],
       };
     });
+    await persistItem({ table: "announcements", item: announcement });
     setAnnouncementDraft({ title: "", body: "", date: "" });
     setEditingAnnouncementId(null);
   };
@@ -111,15 +129,25 @@ export default function Admin() {
       ...current,
       announcements: (current.announcements || []).filter((item) => item.id !== itemId),
     }));
+    removePersistedItem({ table: "announcements", id: itemId });
     if (editingAnnouncementId === itemId) {
       setAnnouncementDraft({ title: "", body: "", date: "" });
       setEditingAnnouncementId(null);
     }
   };
 
-  const saveMission = (event) => {
+  const saveMission = async (event) => {
     event.preventDefault();
     if (!missionDraft.title || !missionDraft.summary) return;
+    const mission = {
+      id: editingMissionId || `mu-${Date.now()}`,
+      title: missionDraft.title,
+      year: missionDraft.year || new Date().getFullYear().toString(),
+      summary: missionDraft.summary,
+      goalKes: Number(missionDraft.goalKes || 0),
+      raisedKes: Number(missionDraft.raisedKes || 0),
+      upcoming: true,
+    };
     setData((current) => {
       if (editingMissionId) {
         return {
@@ -145,19 +173,13 @@ export default function Admin() {
         missions: {
           ...current.missions,
           upcoming: [
-            {
-              id: `mu-${Date.now()}`,
-              title: missionDraft.title,
-              year: missionDraft.year || new Date().getFullYear().toString(),
-              summary: missionDraft.summary,
-              goalKes: Number(missionDraft.goalKes || 0),
-              raisedKes: Number(missionDraft.raisedKes || 0),
-            },
+            mission,
             ...(current.missions?.upcoming || []),
           ],
         },
       };
     });
+    await persistItem({ table: "missions", item: mission });
     setMissionDraft({ title: "", year: "", summary: "", goalKes: "", raisedKes: "" });
     setEditingMissionId(null);
   };
@@ -170,15 +192,21 @@ export default function Admin() {
         upcoming: (current.missions?.upcoming || []).filter((item) => item.id !== itemId),
       },
     }));
+    removePersistedItem({ table: "missions", id: itemId });
     if (editingMissionId === itemId) {
       setMissionDraft({ title: "", year: "", summary: "", goalKes: "", raisedKes: "" });
       setEditingMissionId(null);
     }
   };
 
-  const saveGalleryImage = (event) => {
+  const saveGalleryImage = async (event) => {
     event.preventDefault();
     if (!galleryDraft.caption || !galleryDraft.src) return;
+    const galleryItem = {
+      id: editingGalleryId || `p-${Date.now()}`,
+      src: galleryDraft.src,
+      caption: galleryDraft.caption,
+    };
     setData((current) => {
       if (editingGalleryId) {
         return {
@@ -192,11 +220,12 @@ export default function Admin() {
       return {
         ...current,
         gallery: [
-          { id: `p-${Date.now()}`, src: galleryDraft.src, caption: galleryDraft.caption },
+          galleryItem,
           ...(current.gallery || []),
         ],
       };
     });
+    await persistItem({ table: "gallery", item: galleryItem });
     setGalleryDraft({ caption: "", src: "" });
     setEditingGalleryId(null);
   };
@@ -206,15 +235,26 @@ export default function Admin() {
       ...current,
       gallery: (current.gallery || []).filter((item) => item.id !== itemId),
     }));
+    removePersistedItem({ table: "gallery", id: itemId });
     if (editingGalleryId === itemId) {
       setGalleryDraft({ caption: "", src: "" });
       setEditingGalleryId(null);
     }
   };
 
-  const saveEvent = (event) => {
+  const saveEvent = async (event) => {
     event.preventDefault();
     if (!eventDraft.title || !eventDraft.description) return;
+    const newEvent = {
+      id: editingEventId || `${eventDraft.category}-${Date.now()}`,
+      title: eventDraft.title,
+      date: eventDraft.date,
+      time: eventDraft.time,
+      location: eventDraft.location,
+      description: eventDraft.description,
+      category: eventDraft.category,
+      ...(eventDraft.category === "gatherings" ? { isSabbathEve: false } : {}),
+    };
     setData((current) => {
       if (editingEventId) {
         const nextEvents = Object.entries(current.events || {}).reduce((acc, [category, items]) => {
@@ -232,6 +272,7 @@ export default function Admin() {
           ...(category === "gatherings" ? { isSabbathEve: false } : {}),
         };
         nextEvents[category] = [updatedEvent, ...(nextEvents[category] || [])];
+        persistItem({ table: "events", item: updatedEvent });
         return {
           ...current,
           events: nextEvents,
@@ -243,20 +284,15 @@ export default function Admin() {
         events: {
           ...current.events,
           [eventDraft.category]: [
-            {
-              id: `${eventDraft.category}-${Date.now()}`,
-              title: eventDraft.title,
-              date: eventDraft.date,
-              time: eventDraft.time,
-              location: eventDraft.location,
-              description: eventDraft.description,
-              ...(eventDraft.category === "gatherings" ? { isSabbathEve: false } : {}),
-            },
+            newEvent,
             ...((current.events?.[eventDraft.category] || [])),
           ],
         },
       };
     });
+    if (!editingEventId) {
+      await persistItem({ table: "events", item: newEvent });
+    }
     setEventDraft({ title: "", date: "", time: "", location: "", description: "", category: eventDraft.category });
     setEditingEventId(null);
   };
@@ -269,27 +305,31 @@ export default function Admin() {
         return acc;
       }, {}),
     }));
+    removePersistedItem({ table: "events", id: itemId });
     if (editingEventId === itemId) {
       setEventDraft({ title: "", date: "", time: "", location: "", description: "", category: "services" });
       setEditingEventId(null);
     }
   };
 
-  const saveMinistry = (event) => {
+  const saveMinistry = async (event) => {
     event.preventDefault();
     if (!ministryDraft.name || !ministryDraft.description) return;
+    const ministry = {
+      id: editingMinistryId || `m-${Date.now()}`,
+      name: ministryDraft.name,
+      tagline: ministryDraft.tagline,
+      description: ministryDraft.description,
+      meetingDay: ministryDraft.meetingDay,
+      meetingTime: ministryDraft.meetingTime,
+    };
     setData((current) => {
       if (editingMinistryId) {
         return {
           ...current,
           ministries: (current.ministries || []).map((item) => (item.id === editingMinistryId
             ? {
-              ...item,
-              name: ministryDraft.name,
-              tagline: ministryDraft.tagline,
-              description: ministryDraft.description,
-              meetingDay: ministryDraft.meetingDay,
-              meetingTime: ministryDraft.meetingTime,
+              ...ministry,
             }
             : item)),
         };
@@ -298,18 +338,12 @@ export default function Admin() {
       return {
         ...current,
         ministries: [
-          {
-            id: `m-${Date.now()}`,
-            name: ministryDraft.name,
-            tagline: ministryDraft.tagline,
-            description: ministryDraft.description,
-            meetingDay: ministryDraft.meetingDay,
-            meetingTime: ministryDraft.meetingTime,
-          },
+          ministry,
           ...(current.ministries || []),
         ],
       };
     });
+    await persistItem({ table: "ministries", item: ministry });
     setMinistryDraft({ name: "", tagline: "", description: "", meetingDay: "", meetingTime: "" });
     setEditingMinistryId(null);
   };
@@ -319,27 +353,31 @@ export default function Admin() {
       ...current,
       ministries: (current.ministries || []).filter((item) => item.id !== itemId),
     }));
+    removePersistedItem({ table: "ministries", id: itemId });
     if (editingMinistryId === itemId) {
       setMinistryDraft({ name: "", tagline: "", description: "", meetingDay: "", meetingTime: "" });
       setEditingMinistryId(null);
     }
   };
 
-  const saveLeader = (event) => {
+  const saveLeader = async (event) => {
     event.preventDefault();
     if (!leaderDraft.name || !leaderDraft.role) return;
+    const leader = {
+      id: editingLeaderId || `l-${Date.now()}`,
+      name: leaderDraft.name,
+      role: leaderDraft.role,
+      bio: leaderDraft.bio,
+      photo: leaderDraft.photo || "https://picsum.photos/seed/leader/300/300",
+      photoDesc: `${leaderDraft.name} portrait`,
+    };
     setData((current) => {
       if (editingLeaderId) {
         return {
           ...current,
           leadership: (current.leadership || []).map((item) => (item.id === editingLeaderId
             ? {
-              ...item,
-              name: leaderDraft.name,
-              role: leaderDraft.role,
-              bio: leaderDraft.bio,
-              photo: leaderDraft.photo || item.photo || "https://picsum.photos/seed/leader/300/300",
-              photoDesc: `${leaderDraft.name} portrait`,
+              ...leader,
             }
             : item)),
         };
@@ -348,18 +386,12 @@ export default function Admin() {
       return {
         ...current,
         leadership: [
-          {
-            id: `l-${Date.now()}`,
-            name: leaderDraft.name,
-            role: leaderDraft.role,
-            bio: leaderDraft.bio,
-            photo: leaderDraft.photo || "https://picsum.photos/seed/leader/300/300",
-            photoDesc: `${leaderDraft.name} portrait`,
-          },
+          leader,
           ...(current.leadership || []),
         ],
       };
     });
+    await persistItem({ table: "leadership", item: leader });
     setLeaderDraft({ name: "", role: "", bio: "", photo: "" });
     setEditingLeaderId(null);
   };
@@ -369,28 +401,32 @@ export default function Admin() {
       ...current,
       leadership: (current.leadership || []).filter((item) => item.id !== itemId),
     }));
+    removePersistedItem({ table: "leadership", id: itemId });
     if (editingLeaderId === itemId) {
       setLeaderDraft({ name: "", role: "", bio: "", photo: "" });
       setEditingLeaderId(null);
     }
   };
 
-  const saveSermon = (event) => {
+  const saveSermon = async (event) => {
     event.preventDefault();
     if (!sermonDraft.title || !sermonDraft.description) return;
+    const sermon = {
+      id: editingSermonId || `sermon-${Date.now()}`,
+      title: sermonDraft.title,
+      speaker: sermonDraft.speaker,
+      date: sermonDraft.date,
+      scripture: sermonDraft.scripture,
+      youtubeUrl: sermonDraft.youtubeUrl,
+      description: sermonDraft.description,
+    };
     setData((current) => {
       if (editingSermonId) {
         return {
           ...current,
           sermons: (current.sermons || []).map((item) => (item.id === editingSermonId
             ? {
-              ...item,
-              title: sermonDraft.title,
-              speaker: sermonDraft.speaker,
-              date: sermonDraft.date,
-              scripture: sermonDraft.scripture,
-              youtubeUrl: sermonDraft.youtubeUrl,
-              description: sermonDraft.description,
+              ...sermon,
             }
             : item)),
         };
@@ -399,19 +435,12 @@ export default function Admin() {
       return {
         ...current,
         sermons: [
-          {
-            id: `sermon-${Date.now()}`,
-            title: sermonDraft.title,
-            speaker: sermonDraft.speaker,
-            date: sermonDraft.date,
-            scripture: sermonDraft.scripture,
-            youtubeUrl: sermonDraft.youtubeUrl,
-            description: sermonDraft.description,
-          },
+          sermon,
           ...(current.sermons || []),
         ],
       };
     });
+    await persistItem({ table: "sermons", item: sermon });
     setSermonDraft({ title: "", speaker: "", date: "", scripture: "", description: "", youtubeUrl: "" });
     setEditingSermonId(null);
   };
@@ -421,15 +450,22 @@ export default function Admin() {
       ...current,
       sermons: (current.sermons || []).filter((item) => item.id !== itemId),
     }));
+    removePersistedItem({ table: "sermons", id: itemId });
     if (editingSermonId === itemId) {
       setSermonDraft({ title: "", speaker: "", date: "", scripture: "", description: "", youtubeUrl: "" });
       setEditingSermonId(null);
     }
   };
 
-  const updateChoir = (event) => {
+  const updateChoir = async (event) => {
     event.preventDefault();
     if (!choirVideoDraft.title || !choirVideoDraft.youtubeUrl) return;
+    const video = {
+      id: choirVideoDraft.id || `cv-${Date.now()}`,
+      title: choirVideoDraft.title,
+      youtubeUrl: choirVideoDraft.youtubeUrl,
+      date: choirVideoDraft.date,
+    };
 
     setData((current) => {
       const existingVideos = current.choir?.videos || [];
@@ -443,12 +479,7 @@ export default function Admin() {
           }
           : video))
         : [
-          {
-            id: `cv-${Date.now()}`,
-            title: choirVideoDraft.title,
-            youtubeUrl: choirVideoDraft.youtubeUrl,
-            date: choirVideoDraft.date,
-          },
+          video,
           ...existingVideos,
         ];
 
@@ -460,6 +491,7 @@ export default function Admin() {
         },
       };
     });
+    await persistItem({ table: "choir_videos", item: video });
     setChoirVideoDraft({ id: "", title: "", youtubeUrl: "", date: "" });
   };
 
@@ -471,6 +503,7 @@ export default function Admin() {
         videos: (current.choir?.videos || []).filter((video) => video.id !== videoId),
       },
     }));
+    removePersistedItem({ table: "choir_videos", id: videoId });
     if (choirVideoDraft.id === videoId) {
       setChoirVideoDraft({ id: "", title: "", youtubeUrl: "", date: "" });
     }
