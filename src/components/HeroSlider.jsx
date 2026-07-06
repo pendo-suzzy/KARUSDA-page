@@ -5,8 +5,8 @@ const SLIDES = [
   {
     type: "image",
     src: "/hero-1.jpg",
-    alt: "KARUSDA church image 1",
-    caption: "Worshipping together, every Sabbath",
+    alt: "The Three Angels of Revelation 14 — God's everlasting gospel to the world",
+    caption: "Fear God and give Him glory — Revelation 14:6-12",
   },
   {
     type: "image",

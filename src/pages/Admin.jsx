@@ -51,7 +51,7 @@ export default function Admin() {
     if (isSignUp) {
       const res = await supabase.auth.signUp({ email: authEmail, password: authPassword });
       error = res.error;
-      
+
       // If sign up succeeds but requires email confirmation, session will be null
       if (!error && res.data && !res.data.session) {
         setAuthError("Sign up successful! Please check your email to confirm your account.");

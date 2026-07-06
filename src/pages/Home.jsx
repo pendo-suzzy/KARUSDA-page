@@ -8,6 +8,16 @@ export default function Home() {
   const { data } = useApp();
   const { announcements = [], stats = {}, leadership = [], sermons = [] } = data;
 
+  const weekSchedule = [
+    { day: "Sun", label: "Choir Practice", time: "2:00 PM", color: "#C2A056" },
+    { day: "Mon", label: "Ministry Meetings", time: "5:00 PM", color: "#E07B54" },
+    { day: "Tue", label: "AMO & ALO Fellowship", time: "5:30 PM", color: "#6B8F71" },
+    { day: "Wed", label: "Midweek Vespers", time: "5:30 PM", color: "#7B9EBE" },
+    { day: "Thu", label: "Choir Practice", time: "5:00 PM", color: "#C2A056" },
+    { day: "Fri", label: "Friday Vespers", time: "5:00 PM", color: "#E07B54" },
+    { day: "Sat", label: "Sabbath Worship", time: "7:00 AM", color: "#A855F7" },
+  ];
+
   return (
     <div className="home-page">
       <HeroSlider>
@@ -31,6 +41,26 @@ export default function Home() {
           </div>
         </div>
       </HeroSlider>
+
+      {/* Weekly Schedule Summary */}
+      <section className="week-schedule">
+        <div className="container">
+          <p className="week-schedule__eyebrow">This Week at KARUSDA</p>
+          <h2 className="week-schedule__title">Weekly Activities at a Glance</h2>
+          <div className="week-schedule__timeline">
+            {weekSchedule.map((item) => (
+              <div key={item.day} className="week-day-card" style={{ "--day-color": item.color }}>
+                <div className="week-day-card__day">{item.day}</div>
+                <div className="week-day-card__dot" />
+                <div className="week-day-card__info">
+                  <span className="week-day-card__label">{item.label}</span>
+                  <span className="week-day-card__time">{item.time}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
 
       <section className="section">
         <div className="container">
@@ -69,23 +99,41 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Redesigned Quick Navigation Cards */}
       <section className="quicklinks">
         <div className="container">
+          <p className="week-schedule__eyebrow" style={{ color: "rgba(255,252,244,0.6)" }}>Explore</p>
+          <h2 className="section__title" style={{ color: "var(--paper)", marginBottom: "var(--space-4)" }}>Find your place in the church</h2>
           <div className="quicklinks__grid">
-            <Link to="/ministries" className="quicklink">
-              <span className="quicklink__title">Ministries</span>
-              <span className="quicklink__desc">Discover the groups shaping worship, discipleship, and service.</span>
-              <span className="quicklink__arrow">→ Explore</span>
+            <Link to="/ministries" className="quicklink quicklink--ministries">
+              <div className="quicklink__icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+              </div>
+              <div className="quicklink__body">
+                <span className="quicklink__title">Ministries</span>
+                <span className="quicklink__desc">Discover the groups shaping worship, discipleship, and service across campus.</span>
+                <span className="quicklink__arrow">Explore →</span>
+              </div>
             </Link>
-            <Link to="/missions" className="quicklink">
-              <span className="quicklink__title">Missions</span>
-              <span className="quicklink__desc">See how our church reaches out in the community and beyond.</span>
-              <span className="quicklink__arrow">→ Learn more</span>
+            <Link to="/missions" className="quicklink quicklink--missions">
+              <div className="quicklink__icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+              </div>
+              <div className="quicklink__body">
+                <span className="quicklink__title">Missions</span>
+                <span className="quicklink__desc">See how our church reaches out in the community and beyond Kenya's borders.</span>
+                <span className="quicklink__arrow">Learn more →</span>
+              </div>
             </Link>
-            <Link to="/events" className="quicklink">
-              <span className="quicklink__title">Events</span>
-              <span className="quicklink__desc">Find Sabbath worship, vespers, and fellowship opportunities.</span>
-              <span className="quicklink__arrow">→ Join us</span>
+            <Link to="/events" className="quicklink quicklink--events">
+              <div className="quicklink__icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+              </div>
+              <div className="quicklink__body">
+                <span className="quicklink__title">Events</span>
+                <span className="quicklink__desc">Find Sabbath worship services, vespers, and fellowship opportunities.</span>
+                <span className="quicklink__arrow">Join us →</span>
+              </div>
             </Link>
           </div>
         </div>
@@ -134,3 +182,4 @@ export default function Home() {
     </div>
   );
 }
+

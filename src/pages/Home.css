@@ -123,8 +123,108 @@
   gap: var(--space-3);
 }
 
+/* === Weekly Schedule === */
+.week-schedule {
+  background: linear-gradient(135deg, #1a1510 0%, #2a1f12 50%, #1c1810 100%);
+  padding: var(--space-5) 0;
+  position: relative;
+  overflow: hidden;
+}
+
+.week-schedule::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at 30% 50%, rgba(194, 160, 86, 0.08) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.week-schedule__eyebrow {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin: 0 0 0.4rem;
+}
+
+.week-schedule__title {
+  font-family: var(--font-display);
+  font-size: clamp(1.4rem, 3vw, 2rem);
+  color: var(--paper);
+  margin: 0 0 var(--space-4);
+}
+
+.week-schedule__timeline {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 1rem;
+  position: relative;
+}
+
+.week-schedule__timeline::before {
+  content: '';
+  position: absolute;
+  top: 36px;
+  left: calc(100% / 12);
+  right: calc(100% / 12);
+  height: 2px;
+  background: linear-gradient(90deg, transparent, rgba(194,160,86,0.4), transparent);
+  z-index: 0;
+}
+
+.week-day-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 0.5rem;
+  position: relative;
+  z-index: 1;
+}
+
+.week-day-card__day {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(255, 252, 244, 0.6);
+  margin-bottom: 0.2rem;
+}
+
+.week-day-card__dot {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--day-color, var(--gold));
+  box-shadow: 0 0 0 4px rgba(255,255,255,0.06), 0 0 12px var(--day-color, var(--gold));
+  flex-shrink: 0;
+}
+
+.week-day-card__info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.week-day-card__label {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--paper);
+  line-height: 1.3;
+}
+
+.week-day-card__time {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: var(--day-color, var(--gold));
+}
+
+/* === Quicklinks (redesigned) === */
 .quicklinks {
-  background: var(--ink);
+  background: linear-gradient(180deg, #1c1810 0%, #12100c 100%);
+  padding: var(--space-6) 0;
 }
 
 .quicklinks__grid {
@@ -134,39 +234,98 @@
 }
 
 .quicklink {
-  background: rgba(255, 252, 244, 0.04);
-  border: 1px solid rgba(255, 252, 244, 0.14);
-  border-radius: var(--radius);
-  padding: var(--space-3);
+  background: rgba(255, 252, 244, 0.03);
+  border: 1px solid rgba(255, 252, 244, 0.1);
+  border-radius: 16px;
+  padding: var(--space-3) var(--space-3) var(--space-3);
   display: flex;
-  flex-direction: column;
-  gap: 0.4rem;
+  flex-direction: row;
+  align-items: flex-start;
+  gap: var(--space-2);
   color: var(--paper);
-  transition: background 0.2s ease, border-color 0.2s ease, transform 0.15s ease;
+  text-decoration: none;
+  transition: background 0.25s ease, border-color 0.25s ease, transform 0.2s ease, box-shadow 0.25s ease;
+  position: relative;
+  overflow: hidden;
 }
 
+.quicklink::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 16px;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.quicklink--ministries::after { background: radial-gradient(circle at 20% 80%, rgba(168, 85, 247, 0.12) 0%, transparent 70%); }
+.quicklink--missions::after { background: radial-gradient(circle at 20% 80%, rgba(107, 143, 113, 0.15) 0%, transparent 70%); }
+.quicklink--events::after { background: radial-gradient(circle at 20% 80%, rgba(194, 160, 86, 0.15) 0%, transparent 70%); }
+
 .quicklink:hover {
-  background: rgba(255, 252, 244, 0.08);
-  border-color: var(--gold);
-  transform: translateY(-2px);
+  border-color: rgba(255, 252, 244, 0.25);
+  transform: translateY(-4px);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
+}
+
+.quicklink:hover::after {
+  opacity: 1;
+}
+
+.quicklink__icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  position: relative;
+  z-index: 1;
+}
+
+.quicklink--ministries .quicklink__icon { background: rgba(168, 85, 247, 0.15); color: #c084fc; }
+.quicklink--missions .quicklink__icon { background: rgba(107, 143, 113, 0.2); color: #86efac; }
+.quicklink--events .quicklink__icon { background: rgba(194, 160, 86, 0.15); color: var(--gold); }
+
+.quicklink__icon svg {
+  width: 22px;
+  height: 22px;
+}
+
+.quicklink__body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  flex: 1;
+  position: relative;
+  z-index: 1;
 }
 
 .quicklink__title {
   font-family: var(--font-display);
-  font-size: 1.3rem;
-  font-weight: 600;
+  font-size: 1.15rem;
+  font-weight: 700;
+  line-height: 1.2;
 }
 
 .quicklink__desc {
-  color: rgba(255, 252, 244, 0.7);
-  font-size: 0.92rem;
+  color: rgba(255, 252, 244, 0.6);
+  font-size: 0.88rem;
   line-height: 1.5;
 }
 
 .quicklink__arrow {
   font-family: var(--font-mono);
+  font-size: 0.8rem;
   color: var(--gold);
-  margin-top: 0.3rem;
+  margin-top: 0.4rem;
+  display: inline-block;
+  transition: transform 0.2s ease;
+}
+
+.quicklink:hover .quicklink__arrow {
+  transform: translateX(4px);
 }
 
 @media (max-width: 900px) {
@@ -178,13 +337,23 @@
   .quicklinks__grid {
     grid-template-columns: 1fr;
   }
+  .week-schedule__timeline {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  .week-schedule__timeline::before {
+    display: none;
+  }
 }
 
 @media (max-width: 480px) {
   .hero {
     min-height: 100vh;
   }
+  .week-schedule__timeline {
+    grid-template-columns: repeat(2, 1fr);
+  }
 }
+
 
 /* Leaders Section */
 .leaders {
