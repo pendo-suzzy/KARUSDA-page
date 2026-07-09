@@ -98,16 +98,10 @@ export default function Ministries() {
           <h2 className="section__title">Recent recordings</h2>
           <div className="choir-videos__grid">
             {choir.videos?.map((video) => {
-              const videoId = getYoutubeId(video.youtubeUrl || video.youtube_url);
-              const videoLink = video.youtubeUrl || video.youtube_url;
-              return (
-                <a
-                  key={video.id}
-                  href={videoLink}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="choir-video-card"
-                >
+              const videoLink = video.youtubeUrl || video.youtube_url || video.url || video.src;
+              const videoId = getYoutubeId(videoLink);
+              const cardContent = (
+                <>
                   <div className="choir-video-card__thumb-wrap">
                     {videoId ? (
                       <img
@@ -124,7 +118,23 @@ export default function Ministries() {
                     <h3 className="choir-video-card__title">{video.title}</h3>
                     <span className="choir-video-card__date">{video.date}</span>
                   </div>
+                </>
+              );
+
+              return videoLink ? (
+                <a
+                  key={video.id}
+                  href={videoLink}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="choir-video-card"
+                >
+                  {cardContent}
                 </a>
+              ) : (
+                <article key={video.id} className="choir-video-card">
+                  {cardContent}
+                </article>
               );
             })}
           </div>
@@ -136,7 +146,7 @@ export default function Ministries() {
           <h2 className="section__title">Latest sermons</h2>
           <div className="event-list">
             {sermons.slice(0, 2).map((sermon) => {
-              const sermonLink = sermon.youtubeUrl || sermon.youtube_url;
+              const sermonLink = sermon.youtubeUrl || sermon.youtube_url || sermon.url || sermon.src;
               const CardContent = (
                 <>
                   <div className="event-card__when">

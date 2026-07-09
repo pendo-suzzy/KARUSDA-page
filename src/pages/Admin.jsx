@@ -763,7 +763,15 @@ export default function Admin() {
                   <div key={video.id} className="admin-list__row">
                     <div>
                       <strong>{video.title}</strong>
-                      <p>{video.youtubeUrl}</p>
+                      <p>
+                        {video.youtubeUrl ? (
+                          <a href={video.youtubeUrl} target="_blank" rel="noopener noreferrer">
+                            {video.youtubeUrl}
+                          </a>
+                        ) : (
+                          "No video URL provided"
+                        )}
+                      </p>
                     </div>
                     <div>
                       <button
@@ -972,7 +980,15 @@ export default function Admin() {
               <div key={item.id} className="admin-list__row">
                 <div>
                   <strong>{item.caption}</strong>
-                  <p>{item.src}</p>
+                  <p>
+                    {item.src ? (
+                      <a href={item.src} target="_blank" rel="noopener noreferrer">
+                        {item.src}
+                      </a>
+                    ) : (
+                      "No image URL provided"
+                    )}
+                  </p>
                 </div>
                 <div className="admin-list__actions">
                   <button className="admin-delete" type="button" onClick={() => {

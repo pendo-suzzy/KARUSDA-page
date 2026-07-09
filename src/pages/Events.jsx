@@ -97,14 +97,25 @@ export default function Events() {
         <div className="container">
           <h2 className="section__title" style={{ color: "var(--paper)" }}>Gallery</h2>
           <div className="gallery__links-list">
-            {gallery.map((image) => (
-              <a key={image.id} href={image.src} target="_blank" rel="noopener noreferrer" className="wa-link-card">
-                <div className="wa-link-card__body">
-                  <h4 className="wa-link-card__title">{image.caption}</h4>
-                  <p className="wa-link-card__url">{image.src}</p>
-                </div>
-              </a>
-            ))}
+            {gallery.map((image) => {
+              const imageUrl = image.src || image.url || image.photoUrl;
+              return (
+                <a
+                  key={image.id}
+                  href={imageUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="wa-link-card"
+                >
+                  <div className="wa-link-card__body">
+                    <h4 className="wa-link-card__title">{image.caption}</h4>
+                    <p className="wa-link-card__url">
+                      {imageUrl || "No valid URL provided"}
+                    </p>
+                  </div>
+                </a>
+              );
+            })}
           </div>
         </div>
       </section>
