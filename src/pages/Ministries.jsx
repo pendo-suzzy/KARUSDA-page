@@ -1,4 +1,5 @@
 import { useApp } from "../context/AppContext";
+import { getYoutubeId, getYoutubeThumbnail, normalizeUrl } from "../lib/urlHelpers";
 import "./Ministries.css";
 
 const fellowshipGroups = [
@@ -13,13 +14,6 @@ const fellowshipGroups = [
     description: "Encouraging one another through Bible study, service, and hospitality.",
   },
 ];
-
-const getYoutubeId = (url) => {
-  if (!url) return null;
-  const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
-  const match = url.match(regExp);
-  return (match && match[2].length === 11) ? match[2] : null;
-};
 
 export default function Ministries() {
   const { data } = useApp();
@@ -98,15 +92,16 @@ export default function Ministries() {
           <h2 className="section__title">Recent recordings</h2>
           <div className="choir-videos__grid">
             {choir.videos?.map((video) => {
-              const videoLink = video.youtubeUrl || video.youtube_url || video.url || video.src;
-              const videoId = getYoutubeId(videoLink);
+              const rawUrl = video.youtubeUrl || video.youtube_url || video.url || video.src;
+              const videoLink = normalizeUrl(rawUrl);
+              const thumb = getYoutubeThumbnail(rawUrl);
               const cardContent = (
                 <>
                   <div className="choir-video-card__thumb-wrap">
-                    {videoId ? (
+                    {thumb ? (
                       <img
                         className="choir-video-card__thumb"
-                        src={`https://img.youtube.com/vi/${videoId}/mqdefault.jpg`}
+                        src={thumb}
                         alt={video.title}
                       />
                     ) : (
@@ -146,7 +141,8 @@ export default function Ministries() {
           <h2 className="section__title">Latest sermons</h2>
           <div className="event-list">
             {sermons.slice(0, 2).map((sermon) => {
-              const sermonLink = sermon.youtubeUrl || sermon.youtube_url || sermon.url || sermon.src;
+              const rawSermonUrl = sermon.youtubeUrl || sermon.youtube_url || sermon.url || sermon.src;
+              const sermonLink = normalizeUrl(rawSermonUrl);
               const CardContent = (
                 <>
                   <div className="event-card__when">

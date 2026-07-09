@@ -1,6 +1,7 @@
 import { useMemo, useState, useEffect } from "react";
 import { useApp } from "../context/AppContext";
 import { supabase } from "../lib/supabaseClient";
+import { normalizeUrl } from "../lib/urlHelpers";
 import "./Admin.css";
 
 export default function Admin() {
@@ -21,6 +22,10 @@ export default function Admin() {
   const [editingLeaderId, setEditingLeaderId] = useState(null);
   const [editingSermonId, setEditingSermonId] = useState(null);
   const [editingGalleryId, setEditingGalleryId] = useState(null);
+
+  const normalizedGalleryUrl = normalizeUrl(galleryDraft.src?.trim());
+  const normalizedSermonUrl = normalizeUrl(sermonDraft.youtubeUrl?.trim());
+  const normalizedChoirUrl = normalizeUrl(choirVideoDraft.youtubeUrl?.trim());
 
   const [session, setSession] = useState(null);
   const [authEmail, setAuthEmail] = useState("");
@@ -202,9 +207,10 @@ export default function Admin() {
   const saveGalleryImage = async (event) => {
     event.preventDefault();
     if (!galleryDraft.caption || !galleryDraft.src) return;
+    const normalizedSrc = normalizeUrl(galleryDraft.src.trim());
     const galleryItem = {
       id: editingGalleryId || `p-${Date.now()}`,
-      src: galleryDraft.src,
+      src: normalizedSrc,
       caption: galleryDraft.caption,
     };
     setData((current) => {
@@ -212,7 +218,7 @@ export default function Admin() {
         return {
           ...current,
           gallery: (current.gallery || []).map((item) => (item.id === editingGalleryId
-            ? { ...item, src: galleryDraft.src, caption: galleryDraft.caption }
+            ? { ...item, src: normalizedSrc, caption: galleryDraft.caption }
             : item)),
         };
       }
@@ -411,13 +417,14 @@ export default function Admin() {
   const saveSermon = async (event) => {
     event.preventDefault();
     if (!sermonDraft.title || !sermonDraft.description) return;
+    const normalizedLink = normalizeUrl(sermonDraft.youtubeUrl?.trim());
     const sermon = {
       id: editingSermonId || `sermon-${Date.now()}`,
       title: sermonDraft.title,
       speaker: sermonDraft.speaker,
       date: sermonDraft.date,
       scripture: sermonDraft.scripture,
-      youtubeUrl: sermonDraft.youtubeUrl,
+      youtubeUrl: normalizedLink,
       description: sermonDraft.description,
     };
     setData((current) => {
@@ -460,10 +467,11 @@ export default function Admin() {
   const updateChoir = async (event) => {
     event.preventDefault();
     if (!choirVideoDraft.title || !choirVideoDraft.youtubeUrl) return;
+    const normalizedLink = normalizeUrl(choirVideoDraft.youtubeUrl?.trim());
     const video = {
       id: choirVideoDraft.id || `cv-${Date.now()}`,
       title: choirVideoDraft.title,
-      youtubeUrl: choirVideoDraft.youtubeUrl,
+      youtubeUrl: normalizedLink,
       date: choirVideoDraft.date,
     };
 
@@ -474,7 +482,7 @@ export default function Admin() {
           ? {
             ...video,
             title: choirVideoDraft.title || video.title,
-            youtubeUrl: choirVideoDraft.youtubeUrl || video.youtubeUrl,
+            youtubeUrl: normalizedLink || video.youtubeUrl,
             date: choirVideoDraft.date || video.date,
           }
           : video))
@@ -752,6 +760,9 @@ export default function Admin() {
                   YouTube URL
                   <input value={sermonDraft.youtubeUrl} onChange={(event) => setSermonDraft({ ...sermonDraft, youtubeUrl: event.target.value })} />
                 </label>
+                <p className="admin-form__preview">
+                  Normalized link: <code>{normalizedSermonUrl || "Enter a YouTube link above"}</code>
+                </p>
               </>
             )}
 
@@ -809,6 +820,9 @@ export default function Admin() {
                   YouTube URL
                   <input value={choirVideoDraft.youtubeUrl} onChange={(event) => setChoirVideoDraft({ ...choirVideoDraft, youtubeUrl: event.target.value })} />
                 </label>
+                <p className="admin-form__preview">
+                  Normalized link: <code>{normalizedChoirUrl || "Enter a YouTube link above"}</code>
+                </p>
               </>
             )}
 
@@ -823,6 +837,9 @@ export default function Admin() {
                   Image URL
                   <input value={galleryDraft.src} onChange={(event) => setGalleryDraft({ ...galleryDraft, src: event.target.value })} />
                 </label>
+                <p className="admin-form__preview">
+                  Normalized link: <code>{normalizedGalleryUrl || "Enter an image link above"}</code>
+                </p>
               </>
             )}
 

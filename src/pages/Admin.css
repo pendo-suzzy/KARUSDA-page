@@ -147,6 +147,22 @@
   resize: vertical;
 }
 
+.admin-form__preview {
+  font-size: 0.82rem;
+  color: var(--ink-soft);
+  margin: 0;
+  line-height: 1.4;
+}
+
+.admin-form__preview code {
+  display: inline-block;
+  background: rgba(28, 24, 16, 0.04);
+  color: var(--ink);
+  padding: 0.15rem 0.3rem;
+  border-radius: 6px;
+  overflow-wrap: anywhere;
+}
+
 .admin-form__row {
   display: flex;
   gap: var(--space-2);

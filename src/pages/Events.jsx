@@ -1,4 +1,5 @@
 import { useApp } from "../context/AppContext";
+import { normalizeUrl, getThumbnail } from "../lib/urlHelpers";
 import "./Events.css";
 
 export default function Events() {
@@ -98,19 +99,28 @@ export default function Events() {
           <h2 className="section__title" style={{ color: "var(--paper)" }}>Gallery</h2>
           <div className="gallery__links-list">
             {gallery.map((image) => {
-              const imageUrl = image.src || image.url || image.photoUrl;
+              const rawUrl = image.src || image.url || image.photoUrl;
+              const displayUrl = normalizeUrl(rawUrl);
+              const thumb = getThumbnail(rawUrl);
               return (
                 <a
                   key={image.id}
-                  href={imageUrl}
+                  href={displayUrl}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="wa-link-card"
                 >
+                  {thumb && (
+                    <img
+                      className="wa-link-card__thumb"
+                      src={thumb}
+                      alt={image.caption}
+                    />
+                  )}
                   <div className="wa-link-card__body">
                     <h4 className="wa-link-card__title">{image.caption}</h4>
                     <p className="wa-link-card__url">
-                      {imageUrl || "No valid URL provided"}
+                      {displayUrl || "No valid URL provided"}
                     </p>
                   </div>
                 </a>

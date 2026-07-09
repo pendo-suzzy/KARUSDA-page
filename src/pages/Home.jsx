@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import HeroSlider from "../components/HeroSlider";
 import AnnouncementCard from "../components/AnnouncementCard";
 import { useApp } from "../context/AppContext";
+import { normalizeUrl } from "../lib/urlHelpers";
 import "./Home.css";
 
 export default function Home() {
@@ -174,13 +175,28 @@ export default function Home() {
             Encouragement and instruction for the journey of faith.
           </p>
           <div className="announcements__grid">
-            {sermons.slice(0, 2).map((sermon) => (
-              <article key={sermon.id} className="announcement-card">
-                <p className="announcement-card__date">{sermon.date}</p>
-                <h3 className="announcement-card__title">{sermon.title}</h3>
-                <p className="announcement-card__body">{sermon.description}</p>
-              </article>
-            ))}
+            {sermons.slice(0, 2).map((sermon) => {
+              const rawUrl = sermon.youtubeUrl || sermon.youtube_url;
+              const link = normalizeUrl(rawUrl);
+              const inner = (
+                <>
+                  <p className="announcement-card__date">{sermon.date}</p>
+                  <h3 className="announcement-card__title">
+                    {sermon.title} {link && <span style={{ fontSize: '0.85rem', color: 'var(--gold)' }}>▶</span>}
+                  </h3>
+                  <p className="announcement-card__body">{sermon.description}</p>
+                </>
+              );
+              return link ? (
+                <a key={sermon.id} href={link} target="_blank" rel="noopener noreferrer" className="announcement-card" style={{ textDecoration: 'none', color: 'inherit' }}>
+                  {inner}
+                </a>
+              ) : (
+                <article key={sermon.id} className="announcement-card">
+                  {inner}
+                </article>
+              );
+            })}
           </div>
         </div>
       </section>
