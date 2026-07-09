@@ -130,8 +130,14 @@ export function toGooglePhotoUrl(url) {
     return `https://drive.google.com/thumbnail?id=${driveOpenMatch[1]}&sz=w800`;
   }
 
-  // Google Photos share/album links — no direct embed available without OAuth
-  // Return original URL so clicking opens in Google Photos
+  // Google Photos share links can include a direct photo token in the path.
+  const photosShareMatch = url.match(/photos\.google\.com\/share\/[^/]+\/photo\/([a-zA-Z0-9_-]+)(?:[/?]|$)/);
+  if (photosShareMatch) {
+    return `https://lh3.googleusercontent.com/${photosShareMatch[1]}=w800`;
+  }
+
+  // Photos app short links may still open in Google Photos but cannot be
+  // reliably converted to a direct image URL without additional metadata.
   return url;
 }
 
@@ -153,6 +159,7 @@ export function isGooglePhotoUrl(url) {
   if (!url || typeof url !== "string") return false;
   return (
     url.includes("photos.google.com") ||
+    url.includes("photos.app.goo.gl") ||
     url.includes("lh3.googleusercontent.com") ||
     url.includes("drive.google.com")
   );

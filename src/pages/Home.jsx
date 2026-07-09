@@ -155,7 +155,7 @@ export default function Home() {
             {leadership.slice(0, 3).map((person) => (
               <article key={person.id} className="leader-card">
                 <div className="leader-card__image-wrap">
-                  <img src={person.photo} alt={person.name} className="leader-card__image" />
+                  <img src={normalizeUrl(person.photo)} alt={person.name} className="leader-card__image" />
                 </div>
                 <div className="leader-card__details">
                   <h3 className="leader-card__name">{person.name}</h3>

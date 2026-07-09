@@ -143,8 +143,20 @@ export default function Ministries() {
             {sermons.slice(0, 2).map((sermon) => {
               const rawSermonUrl = sermon.youtubeUrl || sermon.youtube_url || sermon.url || sermon.src;
               const sermonLink = normalizeUrl(rawSermonUrl);
+              const sermonThumbnail = getYoutubeThumbnail(rawSermonUrl);
               const CardContent = (
                 <>
+                  <div className="event-card__thumb-wrap">
+                    {sermonThumbnail ? (
+                      <img
+                        className="event-card__thumb"
+                        src={sermonThumbnail}
+                        alt={sermon.title}
+                      />
+                    ) : (
+                      <div className="event-card__thumb-placeholder">Video preview</div>
+                    )}
+                  </div>
                   <div className="event-card__when">
                     <span className="event-card__date">{sermon.date}</span>
                     <span className="event-card__time">{sermon.scripture}</span>

@@ -369,12 +369,13 @@ export default function Admin() {
   const saveLeader = async (event) => {
     event.preventDefault();
     if (!leaderDraft.name || !leaderDraft.role) return;
+    const normalizedPhoto = normalizeUrl(leaderDraft.photo?.trim());
     const leader = {
       id: editingLeaderId || `l-${Date.now()}`,
       name: leaderDraft.name,
       role: leaderDraft.role,
       bio: leaderDraft.bio,
-      photo: leaderDraft.photo || "https://picsum.photos/seed/leader/300/300",
+      photo: normalizedPhoto || "https://picsum.photos/seed/leader/300/300",
       photoDesc: `${leaderDraft.name} portrait`,
     };
     setData((current) => {
