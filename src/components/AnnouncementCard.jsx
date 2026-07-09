@@ -26,14 +26,15 @@ export default function AnnouncementCard({ announcement }) {
       <h3 className="announcement-card__title">{announcement.title}</h3>
       <p className="announcement-card__body">{announcement.body}</p>
       <button
+        type="button"
         className={`announcement-card__like ${justLiked ? "is-liked" : ""}`}
         onClick={handleLike}
-        aria-label={`Like this announcement, ${announcement.likes} likes so far`}
+        aria-label={`Like this announcement, ${announcement.likes ?? 0} likes so far`}
       >
         <svg width="18" height="18" viewBox="0 0 24 24" fill={justLiked ? "var(--clay)" : "none"} stroke="var(--clay)" strokeWidth="2">
           <path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.8z" />
         </svg>
-        <span>{announcement.likes}</span>
+        <span>{announcement.likes ?? 0}</span>
       </button>
     </article>
   );

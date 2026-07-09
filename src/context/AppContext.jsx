@@ -197,6 +197,24 @@ export const AppProvider = ({ children }) => {
     await deleteRow({ table_name, id });
   };
 
+  const likeAnnouncement = async (id) => {
+    let updatedItem;
+
+    setData((current) => {
+      const announcements = (current.announcements || []).map((item) => {
+        if (item.id !== id) return item;
+        updatedItem = { ...item, likes: (item.likes || 0) + 1 };
+        return updatedItem;
+      });
+
+      return { ...current, announcements };
+    });
+
+    if (updatedItem) {
+      await syncItem({ table_name: "announcements", item: updatedItem });
+    }
+  };
+
   const getUniqueId = (prefix) => `${prefix}-${Date.now()}`;
 
   const actions = useMemo(() => ({
@@ -204,6 +222,7 @@ export const AppProvider = ({ children }) => {
     syncItem,
     removeItem,
     getUniqueId,
+    likeAnnouncement,
   }), []);
 
   return (
