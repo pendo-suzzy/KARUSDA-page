@@ -144,7 +144,7 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="leaders">
+      <section id="leadership" className="leaders">
         <div className="container">
           <h2 className="section__title">Meet the leadership</h2>
           <p className="section__intro">
@@ -167,7 +167,7 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="section">
+      <section id="sermons" className="section">
         <div className="container">
           <h2 className="section__title">Recent sermons</h2>
           <p className="section__intro">

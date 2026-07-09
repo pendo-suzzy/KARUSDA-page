@@ -272,3 +272,18 @@
   font-size: 0.75rem;
   color: var(--clay);
 }
+
+a.choir-video-card,
+a.event-card {
+  text-decoration: none;
+  color: inherit;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+a.event-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(28, 24, 16, 0.06);
+  border-color: var(--gold-soft);
+}
+

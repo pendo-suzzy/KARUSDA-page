@@ -2,20 +2,26 @@ import { useState } from "react";
 import { NavLink } from "react-router-dom";
 import "./Navbar.css";
 
-const LINKS = [
-  { to: "/", label: "Home" },
-  { to: "/events", label: "Events" },
-  { to: "/ministries", label: "Ministries" },
-  { to: "/missions", label: "Missions" },
-];
-
 export default function Navbar() {
   const [open, setOpen] = useState(false);
+  const [activeDropdown, setActiveDropdown] = useState(null);
+
+  const toggleDropdown = (name, e) => {
+    if (window.innerWidth <= 860) {
+      e.preventDefault();
+      setActiveDropdown(activeDropdown === name ? null : name);
+    }
+  };
+
+  const handleLinkClick = () => {
+    setOpen(false);
+    setActiveDropdown(null);
+  };
 
   return (
     <header className="navbar">
       <div className="container navbar__row">
-        <NavLink to="/" className="navbar__brand" onClick={() => setOpen(false)}>
+        <NavLink to="/" className="navbar__brand" onClick={handleLinkClick}>
           <img src="/sdalogo.png" alt="Seventh-day Adventist Church Logo" className="navbar__logo-img" />
           <span className="navbar__name">
             KARUSDA
@@ -35,20 +41,70 @@ export default function Navbar() {
         </button>
 
         <nav className={`navbar__links ${open ? "is-open" : ""}`}>
-          {LINKS.map((link) => (
+          {/* Home Link with Dropdown */}
+          <div className={`navbar__item-dropdown ${activeDropdown === "home" ? "is-open" : ""}`}>
             <NavLink
-              key={link.to}
-              to={link.to}
+              to="/"
               className={({ isActive }) => "navbar__link" + (isActive ? " is-active" : "")}
-              onClick={() => setOpen(false)}
+              onClick={(e) => toggleDropdown("home", e)}
             >
-              {link.label}
+              Home <span className="navbar__arrow">▼</span>
             </NavLink>
-          ))}
+            <div className="navbar__dropdown">
+              <NavLink to="/#announcements" className="navbar__dropdown-link" onClick={handleLinkClick}>
+                Announcements
+              </NavLink>
+              <NavLink to="/#leadership" className="navbar__dropdown-link" onClick={handleLinkClick}>
+                Leadership
+              </NavLink>
+              <NavLink to="/#sermons" className="navbar__dropdown-link" onClick={handleLinkClick}>
+                Sermons
+              </NavLink>
+            </div>
+          </div>
+
+          {/* Events Link */}
+          <NavLink
+            to="/events"
+            className={({ isActive }) => "navbar__link" + (isActive ? " is-active" : "")}
+            onClick={handleLinkClick}
+          >
+            Events
+          </NavLink>
+
+          {/* Ministries Link with Dropdown */}
+          <div className={`navbar__item-dropdown ${activeDropdown === "ministries" ? "is-open" : ""}`}>
+            <NavLink
+              to="/ministries"
+              className={({ isActive }) => "navbar__link" + (isActive ? " is-active" : "")}
+              onClick={(e) => toggleDropdown("ministries", e)}
+            >
+              Ministries <span className="navbar__arrow">▼</span>
+            </NavLink>
+            <div className="navbar__dropdown">
+              <NavLink to="/ministries#ministries-list" className="navbar__dropdown-link" onClick={handleLinkClick}>
+                Ministries
+              </NavLink>
+              <NavLink to="/ministries#choir" className="navbar__dropdown-link" onClick={handleLinkClick}>
+                Choir
+              </NavLink>
+            </div>
+          </div>
+
+          {/* Missions Link */}
+          <NavLink
+            to="/missions"
+            className={({ isActive }) => "navbar__link" + (isActive ? " is-active" : "")}
+            onClick={handleLinkClick}
+          >
+            Missions
+          </NavLink>
+
+          {/* Admin Link */}
           <NavLink
             to="/admin"
             className={({ isActive }) => "navbar__link navbar__link--admin" + (isActive ? " is-active" : "")}
-            onClick={() => setOpen(false)}
+            onClick={handleLinkClick}
           >
             Admin
           </NavLink>

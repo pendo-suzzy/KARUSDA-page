@@ -14,6 +14,13 @@ const fellowshipGroups = [
   },
 ];
 
+const getYoutubeId = (url) => {
+  if (!url) return null;
+  const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+  const match = url.match(regExp);
+  return (match && match[2].length === 11) ? match[2] : null;
+};
+
 export default function Ministries() {
   const { data } = useApp();
   const { ministries = [], choir = {}, sermons = [] } = data;
@@ -30,7 +37,7 @@ export default function Ministries() {
         </div>
       </section>
 
-      <section className="section">
+      <section id="ministries-list" className="section">
         <div className="container">
           <h2 className="section__title">Our ministry families</h2>
           <div className="ministry-grid">
@@ -62,7 +69,7 @@ export default function Ministries() {
         </div>
       </section>
 
-      <section className="section choir">
+      <section id="choir" className="section choir">
         <div className="container">
           <div className="choir__row">
             <div>
@@ -90,18 +97,36 @@ export default function Ministries() {
         <div className="container">
           <h2 className="section__title">Recent recordings</h2>
           <div className="choir-videos__grid">
-            {choir.videos?.map((video) => (
-              <article key={video.id} className="choir-video-card">
-                <div className="choir-video-card__thumb-wrap">
-                  <div className="choir-video-card__thumb-placeholder">Video preview</div>
-                  <div className="choir-video-card__play-btn">▶</div>
-                </div>
-                <div className="choir-video-card__info">
-                  <h3 className="choir-video-card__title">{video.title}</h3>
-                  <span className="choir-video-card__date">{video.date}</span>
-                </div>
-              </article>
-            ))}
+            {choir.videos?.map((video) => {
+              const videoId = getYoutubeId(video.youtubeUrl || video.youtube_url);
+              const videoLink = video.youtubeUrl || video.youtube_url;
+              return (
+                <a
+                  key={video.id}
+                  href={videoLink}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="choir-video-card"
+                >
+                  <div className="choir-video-card__thumb-wrap">
+                    {videoId ? (
+                      <img
+                        className="choir-video-card__thumb"
+                        src={`https://img.youtube.com/vi/${videoId}/mqdefault.jpg`}
+                        alt={video.title}
+                      />
+                    ) : (
+                      <div className="choir-video-card__thumb-placeholder">Video preview</div>
+                    )}
+                    <div className="choir-video-card__play-btn">▶</div>
+                  </div>
+                  <div className="choir-video-card__info">
+                    <h3 className="choir-video-card__title">{video.title}</h3>
+                    <span className="choir-video-card__date">{video.date}</span>
+                  </div>
+                </a>
+              );
+            })}
           </div>
         </div>
       </section>
@@ -110,19 +135,40 @@ export default function Ministries() {
         <div className="container">
           <h2 className="section__title">Latest sermons</h2>
           <div className="event-list">
-            {sermons.slice(0, 2).map((sermon) => (
-              <article key={sermon.id} className="event-card">
-                <div className="event-card__when">
-                  <span className="event-card__date">{sermon.date}</span>
-                  <span className="event-card__time">{sermon.scripture}</span>
-                </div>
-                <div className="event-card__body">
-                  <h3>{sermon.title}</h3>
-                  <p>{sermon.description}</p>
-                  <div className="event-card__location">{sermon.speaker}</div>
-                </div>
-              </article>
-            ))}
+            {sermons.slice(0, 2).map((sermon) => {
+              const sermonLink = sermon.youtubeUrl || sermon.youtube_url;
+              const CardContent = (
+                <>
+                  <div className="event-card__when">
+                    <span className="event-card__date">{sermon.date}</span>
+                    <span className="event-card__time">{sermon.scripture}</span>
+                  </div>
+                  <div className="event-card__body">
+                    <h3 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                      {sermon.title} {sermonLink && <span style={{ fontSize: '0.9rem', color: 'var(--gold)' }}>▶</span>}
+                    </h3>
+                    <p>{sermon.description}</p>
+                    <div className="event-card__location">{sermon.speaker}</div>
+                  </div>
+                </>
+              );
+
+              return sermonLink ? (
+                <a
+                  key={sermon.id}
+                  href={sermonLink}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="event-card event-card--gold"
+                >
+                  {CardContent}
+                </a>
+              ) : (
+                <article key={sermon.id} className="event-card event-card--gold">
+                  {CardContent}
+                </article>
+              );
+            })}
           </div>
         </div>
       </section>
