@@ -144,7 +144,7 @@ export default function Home() {
         </div>
       </section>
 
-      <section id="leadership" className="leaders">
+      <section id="leaders" className="leaders">
         <div className="container">
           <h2 className="section__title">Meet the leadership</h2>
           <p className="section__intro">

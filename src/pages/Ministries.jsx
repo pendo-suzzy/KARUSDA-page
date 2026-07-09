@@ -37,7 +37,7 @@ export default function Ministries() {
         </div>
       </section>
 
-      <section id="ministries-list" className="section">
+      <section id="ministries" className="section">
         <div className="container">
           <h2 className="section__title">Our ministry families</h2>
           <div className="ministry-grid">
