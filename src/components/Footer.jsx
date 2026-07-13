@@ -142,7 +142,7 @@ export default function Footer() {
           <p className="eyebrow footer__heading">Find us</p>
           <p className="footer__line footer__line--icon">
             <IconMapPin />
-            <span>{contact.address}</span>
+            <span>RCH 12</span>
           </p>
           <p className="footer__line footer__line--icon">
             <IconMail />
