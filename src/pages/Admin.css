@@ -119,19 +119,37 @@
   gap: var(--space-2);
 }
 
+.admin-password-field {
+  position: relative;
+}
+
+.admin-password-field input {
+  width: 100%;
+  padding-right: 2.8rem;
+}
+
 .admin-password-toggle {
-  width: fit-content;
+  position: absolute;
+  top: 50%;
+  right: 0.65rem;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
   border: 0;
   background: transparent;
   color: var(--color-primary);
-  font-family: var(--font-mono);
-  font-size: 0.78rem;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
   cursor: pointer;
   padding: 0;
-  margin-top: -0.2rem;
 }
+
+.admin-password-toggle svg {
+  width: 1.1rem;
+  height: 1.1rem;
+}
+
 
 .admin-form h3,
 .admin-form h4 {

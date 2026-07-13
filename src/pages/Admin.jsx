@@ -530,20 +530,35 @@ export default function Admin() {
             </label>
             <label>
               Password
-              <input
-                type={showPassword ? "text" : "password"}
-                value={authPassword}
-                onChange={(e) => setAuthPassword(e.target.value)}
-                required
-              />
+              <div className="admin-password-field">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  value={authPassword}
+                  onChange={(e) => setAuthPassword(e.target.value)}
+                  required
+                />
+                <button
+                  className="admin-password-toggle"
+                  type="button"
+                  aria-label={showPassword ? "Hide password" : "Show password"}
+                  onClick={() => setShowPassword((current) => !current)}
+                >
+                  {showPassword ? (
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                      <path d="M3 3L21 21" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+                      <path d="M10.58 10.58a2 2 0 0 0 2.83 2.83" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+                      <path d="M9.88 5.08A10.94 10.94 0 0 1 12 5c5.18 0 9.27 3.77 10 7-.58 1.42-1.64 2.92-3.02 4.13" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+                      <path d="M6.61 6.61C4.67 7.89 3.16 9.68 2 12c.73 1.79 2.17 3.44 4.08 4.63" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
+                  ) : (
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                      <path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6-10-6-10-6Z" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+                      <circle cx="12" cy="12" r="3" fill="none" stroke="currentColor" strokeWidth="1.8" />
+                    </svg>
+                  )}
+                </button>
+              </div>
             </label>
-            <button
-              className="admin-password-toggle"
-              type="button"
-              onClick={() => setShowPassword((current) => !current)}
-            >
-              {showPassword ? "Hide password" : "Show password"}
-            </button>
             <button className="footer__submit-btn" type="submit" disabled={authLoading}>
               {authLoading ? "Loading..." : "Login"}
             </button>
