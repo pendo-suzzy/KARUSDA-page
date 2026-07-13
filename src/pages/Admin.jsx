@@ -30,7 +30,7 @@ export default function Admin() {
   const [session, setSession] = useState(null);
   const [authEmail, setAuthEmail] = useState("");
   const [authPassword, setAuthPassword] = useState("");
-  const [isSignUp, setIsSignUp] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const [authLoading, setAuthLoading] = useState(false);
   const [authError, setAuthError] = useState(null);
 
@@ -52,21 +52,10 @@ export default function Admin() {
     e.preventDefault();
     setAuthLoading(true);
     setAuthError(null);
-    let error;
-    if (isSignUp) {
-      const res = await supabase.auth.signUp({ email: authEmail, password: authPassword });
-      error = res.error;
 
-      // If sign up succeeds but requires email confirmation, session will be null
-      if (!error && res.data && !res.data.session) {
-        setAuthError("Sign up successful! Please check your email to confirm your account.");
-        setAuthLoading(false);
-        return;
-      }
-    } else {
-      const res = await supabase.auth.signInWithPassword({ email: authEmail, password: authPassword });
-      error = res.error;
-    }
+    const res = await supabase.auth.signInWithPassword({ email: authEmail, password: authPassword });
+    const error = res.error;
+
     if (error) setAuthError(error.message);
     setAuthLoading(false);
   };
@@ -532,7 +521,7 @@ export default function Admin() {
     return (
       <div className="section" style={{ minHeight: "60vh", display: "flex", justifyContent: "center", alignItems: "center" }}>
         <div className="container" style={{ maxWidth: "400px" }}>
-          <h2 style={{ textAlign: "center", marginBottom: "1rem" }}>{isSignUp ? "Sign Up" : "Admin Login"}</h2>
+          <h2 style={{ textAlign: "center", marginBottom: "1rem" }}>Admin Login</h2>
           {authError && <p style={{ color: "red", textAlign: "center", marginBottom: "1rem" }}>{authError}</p>}
           <form className="admin-form" onSubmit={handleAuth}>
             <label>
@@ -541,14 +530,23 @@ export default function Admin() {
             </label>
             <label>
               Password
-              <input type="password" value={authPassword} onChange={(e) => setAuthPassword(e.target.value)} required />
+              <input
+                type={showPassword ? "text" : "password"}
+                value={authPassword}
+                onChange={(e) => setAuthPassword(e.target.value)}
+                required
+              />
             </label>
-            <button className="footer__submit-btn" type="submit" disabled={authLoading}>
-              {authLoading ? "Loading..." : isSignUp ? "Sign Up" : "Login"}
+            <button
+              className="admin-password-toggle"
+              type="button"
+              onClick={() => setShowPassword((current) => !current)}
+            >
+              {showPassword ? "Hide password" : "Show password"}
             </button>
-            <p style={{ textAlign: "center", marginTop: "1rem", cursor: "pointer", color: "var(--color-primary)" }} onClick={() => setIsSignUp(!isSignUp)}>
-              {isSignUp ? "Already have an account? Login" : "Need an account? Sign Up"}
-            </p>
+            <button className="footer__submit-btn" type="submit" disabled={authLoading}>
+              {authLoading ? "Loading..." : "Login"}
+            </button>
           </form>
         </div>
       </div>
