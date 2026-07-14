@@ -106,12 +106,13 @@ export default function Events() {
               const rawUrl = image.src || image.url || image.photoUrl;
               const displayUrl = normalizeUrl(rawUrl);
               const thumb = getThumbnail(rawUrl);
-              const imageSrc = thumb || displayUrl;
+              const imageSrc = thumb || displayUrl || rawUrl;
+              const clickTarget = rawUrl || displayUrl;
               const hasFailed = Boolean(failedImages[image.id]);
               return (
                 <a
                   key={image.id}
-                  href={displayUrl}
+                  href={clickTarget}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="wa-link-card"

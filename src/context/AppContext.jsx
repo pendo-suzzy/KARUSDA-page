@@ -1,5 +1,6 @@
 import { createContext, useContext, useEffect, useState, useMemo } from "react";
 import { supabase } from "../lib/supabaseClient";
+import { normalizeUrl } from "../lib/urlHelpers";
 
 export const AppContext = createContext();
 
@@ -14,6 +15,30 @@ const DEFAULT_DATA = {
   missions: { past: [], upcoming: [] },
   stats: { yearsActive: 0, members: 0, ministries: 0, choirVoices: 0 },
   contact: { address: "", email: "", facebook: "", instagram: "", youtube: "" },
+};
+
+const normalizeItemForTable = ({ table_name, item }) => {
+  const normalizedItem = { ...item };
+
+  if (!normalizedItem) return normalizedItem;
+
+  if (table_name === "gallery") {
+    normalizedItem.src = normalizeUrl(normalizedItem.src || normalizedItem.url || normalizedItem.photoUrl);
+  }
+
+  if (table_name === "leadership") {
+    normalizedItem.photo = normalizeUrl(normalizedItem.photo);
+  }
+
+  if (table_name === "sermons" || table_name === "sermon") {
+    normalizedItem.youtubeUrl = normalizeUrl(normalizedItem.youtubeUrl || normalizedItem.youtube_url);
+  }
+
+  if (table_name === "announcements") {
+    normalizedItem.likes = Number(normalizedItem.likes || 0);
+  }
+
+  return normalizedItem;
 };
 
 const buildItemPayload = (item, table) => {
@@ -123,9 +148,10 @@ const fetchAppData = async () => {
 
 const upsertRow = async ({ table_name, item }) => {
   const table = normalizeTableName(table_name);
+  const normalizedItem = normalizeItemForTable({ table_name, item });
   const { data, error } = await supabase
     .from(table)
-    .upsert(item, { onConflict: ["id"] });
+    .upsert(normalizedItem, { onConflict: ["id"] });
 
   if (error) {
     throw error;
@@ -213,12 +239,31 @@ export const AppProvider = ({ children }) => {
     if (!updatedItem) return;
 
     try {
-      const { error } = await supabase.rpc("increment_announcement_likes", {
-        announcement_id: id,
-      });
+      const { data: existingRow, error: fetchError } = await supabase
+        .from("announcements")
+        .select("likes")
+        .eq("id", id)
+        .maybeSingle();
 
-      if (error) {
-        await syncItem({ table_name: "announcements", item: updatedItem });
+      if (fetchError) {
+        throw fetchError;
+      }
+
+      const nextLikes = Number(existingRow?.likes || updatedItem.likes || 0) + 1;
+      const { error: updateError } = await supabase
+        .from("announcements")
+        .update({ likes: nextLikes })
+        .eq("id", id);
+
+      if (updateError) {
+        try {
+          await supabase.rpc("increment_announcement_likes", {
+            announcement_id: id,
+          });
+        } catch (rpcError) {
+          console.warn("Announcement like RPC unavailable, falling back to upsert.", rpcError);
+          await syncItem({ table_name: "announcements", item: { ...updatedItem, likes: nextLikes } });
+        }
       }
 
       const refreshed = await fetchAppData();

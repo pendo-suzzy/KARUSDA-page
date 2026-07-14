@@ -105,40 +105,58 @@ export function getYoutubeThumbnail(url, quality = "mqdefault") {
 export function toGooglePhotoUrl(url) {
   if (!url || typeof url !== "string") return url;
 
-  // Already a direct lh3 link — just return it (optionally resize)
-  if (url.includes("lh3.googleusercontent.com")) {
-    // Append a width parameter if missing so Google serves a sized version
-    if (!url.includes("=w") && !url.includes("=s")) {
-      return url + "=w800";
+  const trimmedUrl = url.trim();
+
+  // Already a direct image or thumbnail link.
+  if (trimmedUrl.includes("lh3.googleusercontent.com")) {
+    if (!trimmedUrl.includes("=w") && !trimmedUrl.includes("=s")) {
+      return `${trimmedUrl}=w800`;
     }
-    return url;
+    return trimmedUrl;
   }
 
-  // Google Drive file links → convert to direct thumbnail
-  const driveFileMatch = url.match(
-    /drive\.google\.com\/file\/d\/([a-zA-Z0-9_-]+)/
-  );
-  if (driveFileMatch) {
-    return `https://drive.google.com/thumbnail?id=${driveFileMatch[1]}&sz=w800`;
+  if (trimmedUrl.includes("drive.google.com")) {
+    const driveFileMatch = trimmedUrl.match(/drive\.google\.com\/file\/d\/([a-zA-Z0-9_-]+)/);
+    if (driveFileMatch) {
+      return `https://drive.google.com/thumbnail?id=${driveFileMatch[1]}&sz=w800`;
+    }
+
+    const driveOpenMatch = trimmedUrl.match(/drive\.google\.com\/open\?id=([a-zA-Z0-9_-]+)/);
+    if (driveOpenMatch) {
+      return `https://drive.google.com/thumbnail?id=${driveOpenMatch[1]}&sz=w800`;
+    }
+
+    const driveUcMatch = trimmedUrl.match(/[?&]id=([a-zA-Z0-9_-]+)/);
+    if (driveUcMatch) {
+      return `https://drive.google.com/thumbnail?id=${driveUcMatch[1]}&sz=w800`;
+    }
   }
 
-  // Google Drive open?id= links
-  const driveOpenMatch = url.match(
-    /drive\.google\.com\/open\?id=([a-zA-Z0-9_-]+)/
-  );
-  if (driveOpenMatch) {
-    return `https://drive.google.com/thumbnail?id=${driveOpenMatch[1]}&sz=w800`;
+  const photoPatterns = [
+    /photos\.google\.com\/share\/[^/]+\/photo\/([a-zA-Z0-9_-]+)/,
+    /photos\.google\.com\/lh\/photo\/([a-zA-Z0-9_-]+)/,
+    /photos\.google\.com\/share\/([a-zA-Z0-9_-]+)/,
+    /photos\.app\.goo\.gl\/([a-zA-Z0-9_-]+)/,
+  ];
+
+  for (const pattern of photoPatterns) {
+    const match = trimmedUrl.match(pattern);
+    if (match?.[1]) {
+      const token = match[1];
+      return [
+        `https://lh3.googleusercontent.com/pw/${token}`,
+        `https://lh3.googleusercontent.com/${token}`,
+        `https://lh3.googleusercontent.com/pw/${token}=w800`,
+        `https://lh3.googleusercontent.com/${token}=w800`,
+      ][0];
+    }
   }
 
-  // Google Photos share links can include a direct photo token in the path.
-  const photosShareMatch = url.match(/photos\.google\.com\/share\/[^/]+\/photo\/([a-zA-Z0-9_-]+)(?:[/?]|$)/);
-  if (photosShareMatch) {
-    return `https://lh3.googleusercontent.com/${photosShareMatch[1]}=w800`;
+  if (/photos\.google\.com\/album\//.test(trimmedUrl)) {
+    return trimmedUrl;
   }
 
-  // Photos app short links may still open in Google Photos but cannot be
-  // reliably converted to a direct image URL without additional metadata.
-  return url;
+  return trimmedUrl;
 }
 
 /* ------------------------------------------------------------------ */
