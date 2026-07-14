@@ -96,7 +96,9 @@ export default function Events() {
 
       <section className="section gallery">
         <div className="container">
-          <h2 className="section__title" style={{ color: "var(--paper)" }}>Gallery</h2>
+          <div className="gallery__header">
+            <h2 className="section__title gallery__title">Gallery</h2>
+          </div>
           <div className="gallery__links-list">
             {gallery.map((image) => {
               const rawUrl = image.src || image.url || image.photoUrl;
@@ -110,13 +112,19 @@ export default function Events() {
                   rel="noopener noreferrer"
                   className="wa-link-card"
                 >
-                  {thumb && (
-                    <img
-                      className="wa-link-card__thumb"
-                      src={thumb}
-                      alt={image.caption}
-                    />
-                  )}
+                  <div className="wa-link-card__thumb-wrap">
+                    {thumb ? (
+                      <img
+                        className="wa-link-card__thumb"
+                        src={thumb}
+                        alt={image.caption}
+                      />
+                    ) : (
+                      <div className="wa-link-card__thumb-placeholder">
+                        <span>Image preview</span>
+                      </div>
+                    )}
+                  </div>
                   <div className="wa-link-card__body">
                     <h4 className="wa-link-card__title">{image.caption}</h4>
                     <p className="wa-link-card__url">
