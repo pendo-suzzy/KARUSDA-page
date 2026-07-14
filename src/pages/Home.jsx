@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import HeroSlider from "../components/HeroSlider";
 import AnnouncementCard from "../components/AnnouncementCard";
 import { useApp } from "../context/AppContext";
-import { normalizeUrl } from "../lib/urlHelpers";
+import { normalizeUrl, getYoutubeThumbnail } from "../lib/urlHelpers";
 import "./Home.css";
 
 export default function Home() {
@@ -174,26 +174,41 @@ export default function Home() {
           <p className="section__intro">
             Encouragement and instruction for the journey of faith.
           </p>
-          <div className="announcements__grid">
+          <div className="sermon-grid">
             {sermons.slice(0, 2).map((sermon) => {
               const rawUrl = sermon.youtubeUrl || sermon.youtube_url;
               const link = normalizeUrl(rawUrl);
-              const inner = (
+              const thumbnail = getYoutubeThumbnail(rawUrl);
+              const cardContent = (
                 <>
-                  <p className="announcement-card__date">{sermon.date}</p>
-                  <h3 className="announcement-card__title">
-                    {sermon.title} {link && <span style={{ fontSize: '0.85rem', color: 'var(--gold)' }}>▶</span>}
-                  </h3>
-                  <p className="announcement-card__body">{sermon.description}</p>
+                  <div className="sermon-card__thumb-wrap">
+                    {thumbnail ? (
+                      <img className="sermon-card__thumb" src={thumbnail} alt={sermon.title} />
+                    ) : (
+                      <div className="sermon-card__thumb-placeholder">Video preview</div>
+                    )}
+                  </div>
+                  <div className="sermon-card__body">
+                    <div className="sermon-card__meta">
+                      <span className="sermon-card__date">{sermon.date}</span>
+                      {sermon.scripture ? <span className="sermon-card__scripture">{sermon.scripture}</span> : null}
+                    </div>
+                    <h3 className="sermon-card__title">
+                      {sermon.title} {link && <span className="sermon-card__play">▶</span>}
+                    </h3>
+                    <p className="sermon-card__desc">{sermon.description}</p>
+                    {sermon.speaker ? <div className="sermon-card__speaker">{sermon.speaker}</div> : null}
+                  </div>
                 </>
               );
+
               return link ? (
-                <a key={sermon.id} href={link} target="_blank" rel="noopener noreferrer" className="announcement-card" style={{ textDecoration: 'none', color: 'inherit' }}>
-                  {inner}
+                <a key={sermon.id} href={link} target="_blank" rel="noopener noreferrer" className="sermon-card">
+                  {cardContent}
                 </a>
               ) : (
-                <article key={sermon.id} className="announcement-card">
-                  {inner}
+                <article key={sermon.id} className="sermon-card">
+                  {cardContent}
                 </article>
               );
             })}
