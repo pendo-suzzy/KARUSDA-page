@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useApp } from "../context/AppContext";
 import { normalizeUrl, getThumbnail } from "../lib/urlHelpers";
 import "./Events.css";
@@ -7,6 +8,7 @@ export default function Events() {
   const { events = {}, gallery = [] } = data;
   const { services = [], gatherings = [], volunteer = [] } = events;
   const fridayVespers = gatherings.find((item) => item.isSabbathEve) || gatherings[0];
+  const [failedImages, setFailedImages] = useState({});
 
   return (
     <div className="events-page">
@@ -104,6 +106,8 @@ export default function Events() {
               const rawUrl = image.src || image.url || image.photoUrl;
               const displayUrl = normalizeUrl(rawUrl);
               const thumb = getThumbnail(rawUrl);
+              const imageSrc = thumb || displayUrl;
+              const hasFailed = Boolean(failedImages[image.id]);
               return (
                 <a
                   key={image.id}
@@ -113,15 +117,16 @@ export default function Events() {
                   className="wa-link-card"
                 >
                   <div className="wa-link-card__thumb-wrap">
-                    {thumb ? (
+                    {imageSrc && !hasFailed ? (
                       <img
                         className="wa-link-card__thumb"
-                        src={thumb}
+                        src={imageSrc}
                         alt={image.caption}
+                        onError={() => setFailedImages((prev) => ({ ...prev, [image.id]: true }))}
                       />
                     ) : (
                       <div className="wa-link-card__thumb-placeholder">
-                        <span>Image preview</span>
+                        <span>{image.caption || "Image preview"}</span>
                       </div>
                     )}
                   </div>
