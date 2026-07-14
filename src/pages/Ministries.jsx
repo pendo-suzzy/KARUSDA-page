@@ -1,5 +1,6 @@
 import { useApp } from "../context/AppContext";
 import { getYoutubeId, getYoutubeThumbnail, normalizeUrl } from "../lib/urlHelpers";
+import "../components/AnnouncementCard.css";
 import "./Ministries.css";
 
 const fellowshipGroups = [
@@ -139,35 +140,17 @@ export default function Ministries() {
       <section className="section">
         <div className="container">
           <h2 className="section__title">Latest sermons</h2>
-          <div className="event-list">
+          <div className="ministries-sermons__grid">
             {sermons.slice(0, 2).map((sermon) => {
               const rawSermonUrl = sermon.youtubeUrl || sermon.youtube_url || sermon.url || sermon.src;
               const sermonLink = normalizeUrl(rawSermonUrl);
-              const sermonThumbnail = getYoutubeThumbnail(rawSermonUrl);
-              const CardContent = (
+              const inner = (
                 <>
-                  <div className="event-card__thumb-wrap">
-                    {sermonThumbnail ? (
-                      <img
-                        className="event-card__thumb"
-                        src={sermonThumbnail}
-                        alt={sermon.title}
-                      />
-                    ) : (
-                      <div className="event-card__thumb-placeholder">Video preview</div>
-                    )}
-                  </div>
-                  <div className="event-card__when">
-                    <span className="event-card__date">{sermon.date}</span>
-                    <span className="event-card__time">{sermon.scripture}</span>
-                  </div>
-                  <div className="event-card__body">
-                    <h3 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                      {sermon.title} {sermonLink && <span style={{ fontSize: '0.9rem', color: 'var(--gold)' }}>▶</span>}
-                    </h3>
-                    <p>{sermon.description}</p>
-                    <div className="event-card__location">{sermon.speaker}</div>
-                  </div>
+                  <p className="announcement-card__date">{sermon.date}</p>
+                  <h3 className="announcement-card__title">
+                    {sermon.title} {sermonLink && <span style={{ fontSize: '0.85rem', color: 'var(--gold)' }}>▶</span>}
+                  </h3>
+                  <p className="announcement-card__body">{sermon.description}</p>
                 </>
               );
 
@@ -177,13 +160,14 @@ export default function Ministries() {
                   href={sermonLink}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="event-card event-card--gold"
+                  className="announcement-card"
+                  style={{ textDecoration: 'none', color: 'inherit' }}
                 >
-                  {CardContent}
+                  {inner}
                 </a>
               ) : (
-                <article key={sermon.id} className="event-card event-card--gold">
-                  {CardContent}
+                <article key={sermon.id} className="announcement-card">
+                  {inner}
                 </article>
               );
             })}
