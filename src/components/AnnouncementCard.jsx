@@ -13,11 +13,19 @@ function formatDate(iso) {
 export default function AnnouncementCard({ announcement }) {
   const { likeAnnouncement } = useApp();
   const [justLiked, setJustLiked] = useState(false);
+  const [isLiking, setIsLiking] = useState(false);
 
-  const handleLike = () => {
-    likeAnnouncement(announcement.id);
-    setJustLiked(true);
-    setTimeout(() => setJustLiked(false), 400);
+  const handleLike = async () => {
+    if (isLiking) return;
+
+    setIsLiking(true);
+    try {
+      await likeAnnouncement(announcement.id);
+      setJustLiked(true);
+      setTimeout(() => setJustLiked(false), 400);
+    } finally {
+      setIsLiking(false);
+    }
   };
 
   return (
@@ -29,6 +37,7 @@ export default function AnnouncementCard({ announcement }) {
         type="button"
         className={`announcement-card__like ${justLiked ? "is-liked" : ""}`}
         onClick={handleLike}
+        disabled={isLiking}
         aria-label={`Like this announcement, ${announcement.likes ?? 0} likes so far`}
       >
         <svg width="18" height="18" viewBox="0 0 24 24" fill={justLiked ? "var(--clay)" : "none"} stroke="var(--clay)" strokeWidth="2">

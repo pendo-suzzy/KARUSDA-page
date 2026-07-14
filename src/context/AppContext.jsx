@@ -198,7 +198,7 @@ export const AppProvider = ({ children }) => {
   };
 
   const likeAnnouncement = async (id) => {
-    let updatedItem;
+    let updatedItem = null;
 
     setData((current) => {
       const announcements = (current.announcements || []).map((item) => {
@@ -210,8 +210,23 @@ export const AppProvider = ({ children }) => {
       return { ...current, announcements };
     });
 
-    if (updatedItem) {
-      await syncItem({ table_name: "announcements", item: updatedItem });
+    if (!updatedItem) return;
+
+    try {
+      const { error } = await supabase.rpc("increment_announcement_likes", {
+        announcement_id: id,
+      });
+
+      if (error) {
+        await syncItem({ table_name: "announcements", item: updatedItem });
+      }
+
+      const refreshed = await fetchAppData();
+      setData(refreshed);
+    } catch (err) {
+      console.error("Failed to persist announcement like:", err);
+      const refreshed = await fetchAppData();
+      setData(refreshed);
     }
   };
 
