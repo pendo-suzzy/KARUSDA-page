@@ -155,7 +155,7 @@ export default function Home() {
             {leadership.slice(0, 3).map((person) => (
               <article key={person.id} className="leadership-card">
                 <div className="leadership-card__image-wrap">
-                  <img src={normalizeUrl(person.photo)} alt={person.name} className="leadership-card__image" />
+                  <img src={normalizeUrl(person.photo) || "/sdalogo.png"} alt={person.name} className="leadership-card__image" style={!person.photo ? { objectFit: "contain", padding: "1rem" } : {}} />
                 </div>
                 <div className="leadership-card__details">
                   <h3 className="leadership-card__name">{person.name}</h3>

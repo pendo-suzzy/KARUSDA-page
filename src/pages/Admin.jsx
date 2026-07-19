@@ -403,7 +403,7 @@ export default function Admin() {
       name: leadershipDraft.name,
       role: leadershipDraft.role,
       bio: leadershipDraft.bio,
-      photo: normalizedPhoto || "https://picsum.photos/seed/leader/300/300",
+      photo: normalizedPhoto || "",
       photoDesc: `${leadershipDraft.name} portrait`,
     };
     setData((current) => {
