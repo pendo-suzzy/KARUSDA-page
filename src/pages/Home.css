@@ -400,19 +400,19 @@
 }
 
 
-/* Leaders Section */
-.leaders {
+/* Leadership Section */
+.leadership {
   background: var(--paper);
 }
 
-.leaders__grid {
+.leadership__grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
   gap: var(--space-4);
   margin-top: var(--space-3);
 }
 
-.leader-card {
+.leadership-card {
   background: var(--cream);
   border: 1px solid var(--line);
   border-radius: var(--radius);
@@ -426,12 +426,12 @@
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
-.leader-card:hover {
+.leadership-card:hover {
   transform: translateY(-4px);
   box-shadow: 0 8px 24px rgba(28, 24, 16, 0.08);
 }
 
-.leader-card__image-wrap {
+.leadership-card__image-wrap {
   position: relative;
   width: 110px;
   height: 110px;
@@ -444,36 +444,36 @@
   margin-bottom: var(--space-2);
 }
 
-.leader-card__image {
+.leadership-card__image {
   width: 100%;
   height: 100%;
   object-fit: cover;
   transition: transform 0.3s ease;
 }
 
-.leader-card:hover .leader-card__image {
+.leadership-card:hover .leadership-card__image {
   transform: scale(1.07);
 }
 
-.leader-card__caption {
+.leadership-card__caption {
   display: none;
 }
 
-.leader-card__details {
+.leadership-card__details {
   padding: var(--space-2);
   display: flex;
   flex-direction: column;
   flex-grow: 1;
 }
 
-.leader-card__name {
+.leadership-card__name {
   font-family: var(--font-display);
   font-size: 1.25rem;
   margin: 0 0 0.2rem;
   color: var(--ink);
 }
 
-.leader-card__role {
+.leadership-card__role {
   font-family: var(--font-mono);
   font-size: 0.75rem;
   letter-spacing: 0.05em;
@@ -483,7 +483,7 @@
   display: block;
 }
 
-.leader-card__bio {
+.leadership-card__bio {
   font-size: 0.9rem;
   color: var(--ink-soft);
   line-height: 1.5;

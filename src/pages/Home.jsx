@@ -145,22 +145,22 @@ export default function Home() {
         </div>
       </section>
 
-      <section id="leaders" className="leaders">
+      <section id="leadership" className="leadership">
         <div className="container">
           <h2 className="section__title">Meet the leadership</h2>
           <p className="section__intro">
             Dedicated servants guiding the church in worship, care, and outreach.
           </p>
-          <div className="leaders__grid">
+          <div className="leadership__grid">
             {leadership.slice(0, 3).map((person) => (
-              <article key={person.id} className="leader-card">
-                <div className="leader-card__image-wrap">
-                  <img src={normalizeUrl(person.photo)} alt={person.name} className="leader-card__image" />
+              <article key={person.id} className="leadership-card">
+                <div className="leadership-card__image-wrap">
+                  <img src={normalizeUrl(person.photo)} alt={person.name} className="leadership-card__image" />
                 </div>
-                <div className="leader-card__details">
-                  <h3 className="leader-card__name">{person.name}</h3>
-                  <span className="leader-card__role">{person.role}</span>
-                  <p className="leader-card__bio">{person.bio}</p>
+                <div className="leadership-card__details">
+                  <h3 className="leadership-card__name">{person.name}</h3>
+                  <span className="leadership-card__role">{person.role}</span>
+                  <p className="leadership-card__bio">{person.bio}</p>
                 </div>
               </article>
             ))}

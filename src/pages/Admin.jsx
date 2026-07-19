@@ -12,14 +12,14 @@ export default function Admin() {
   const [galleryDraft, setGalleryDraft] = useState({ caption: "", src: "" });
   const [eventDraft, setEventDraft] = useState({ title: "", date: "", time: "", location: "", description: "", category: "services", imageUrl: "" });
   const [ministryDraft, setMinistryDraft] = useState({ name: "", tagline: "", description: "", meetingDay: "", meetingTime: "" });
-  const [leaderDraft, setLeaderDraft] = useState({ name: "", role: "", bio: "", photo: "" });
+  const [leadershipDraft, setLeadershipDraft] = useState({ name: "", role: "", bio: "", photo: "" });
   const [sermonDraft, setSermonDraft] = useState({ title: "", speaker: "", date: "", scripture: "", description: "", youtubeUrl: "" });
   const [choirVideoDraft, setChoirVideoDraft] = useState({ id: "", title: "", youtubeUrl: "", date: "" });
   const [editingAnnouncementId, setEditingAnnouncementId] = useState(null);
   const [editingMissionId, setEditingMissionId] = useState(null);
   const [editingEventId, setEditingEventId] = useState(null);
   const [editingMinistryId, setEditingMinistryId] = useState(null);
-  const [editingLeaderId, setEditingLeaderId] = useState(null);
+  const [editingLeadershipId, setEditingLeadershipId] = useState(null);
   const [editingSermonId, setEditingSermonId] = useState(null);
   const [editingGalleryId, setEditingGalleryId] = useState(null);
   const [isUploading, setIsUploading] = useState(false);
@@ -31,7 +31,7 @@ export default function Admin() {
     setIsUploading(true);
     try {
       const fileName = `${Date.now()}-${file.name.replace(/\s+/g, '-')}`;
-      
+
       const { error } = await supabase.storage
         .from("images")
         .upload(fileName, file);
@@ -394,25 +394,25 @@ export default function Admin() {
     }
   };
 
-  const saveLeader = async (event) => {
+  const saveLeadership = async (event) => {
     event.preventDefault();
-    if (!leaderDraft.name || !leaderDraft.role) return;
-    const normalizedPhoto = normalizeUrl(leaderDraft.photo?.trim());
-    const leader = {
-      id: editingLeaderId || `l-${Date.now()}`,
-      name: leaderDraft.name,
-      role: leaderDraft.role,
-      bio: leaderDraft.bio,
+    if (!leadershipDraft.name || !leadershipDraft.role) return;
+    const normalizedPhoto = normalizeUrl(leadershipDraft.photo?.trim());
+    const leadershipItem = {
+      id: editingLeadershipId || `l-${Date.now()}`,
+      name: leadershipDraft.name,
+      role: leadershipDraft.role,
+      bio: leadershipDraft.bio,
       photo: normalizedPhoto || "https://picsum.photos/seed/leader/300/300",
-      photoDesc: `${leaderDraft.name} portrait`,
+      photoDesc: `${leadershipDraft.name} portrait`,
     };
     setData((current) => {
-      if (editingLeaderId) {
+      if (editingLeadershipId) {
         return {
           ...current,
-          leadership: (current.leadership || []).map((item) => (item.id === editingLeaderId
+          leadership: (current.leadership || []).map((item) => (item.id === editingLeadershipId
             ? {
-              ...leader,
+              ...leadershipItem,
             }
             : item)),
         };
@@ -421,25 +421,25 @@ export default function Admin() {
       return {
         ...current,
         leadership: [
-          leader,
+          leadershipItem,
           ...(current.leadership || []),
         ],
       };
     });
-    await persistItem({ table: "leadership", item: leader });
-    setLeaderDraft({ name: "", role: "", bio: "", photo: "" });
-    setEditingLeaderId(null);
+    await persistItem({ table: "leadership", item: leadershipItem });
+    setLeadershipDraft({ name: "", role: "", bio: "", photo: "" });
+    setEditingLeadershipId(null);
   };
 
-  const deleteLeader = (itemId) => {
+  const deleteLeadership = (itemId) => {
     setData((current) => ({
       ...current,
       leadership: (current.leadership || []).filter((item) => item.id !== itemId),
     }));
     removePersistedItem({ table: "leadership", id: itemId });
-    if (editingLeaderId === itemId) {
-      setLeaderDraft({ name: "", role: "", bio: "", photo: "" });
-      setEditingLeaderId(null);
+    if (editingLeadershipId === itemId) {
+      setLeadershipDraft({ name: "", role: "", bio: "", photo: "" });
+      setEditingLeadershipId(null);
     }
   };
 
@@ -552,7 +552,7 @@ export default function Admin() {
     galleryItems: data.gallery?.length || 0,
     events: (data.events?.services?.length || 0) + (data.events?.gatherings?.length || 0) + (data.events?.volunteer?.length || 0),
     ministries: data.ministries?.length || 0,
-    leaders: data.leadership?.length || 0,
+    leadership: data.leadership?.length || 0,
     sermons: data.sermons?.length || 0,
   }), [data]);
 
@@ -627,6 +627,7 @@ export default function Admin() {
             ["events", "Events"],
             ["ministries", "Ministries"],
             ["leaders", "Leaders"],
+            ["leadership", "Leadership"],
             ["sermons", "Sermons"],
             ["choir", "Choir"],
             ["missions", "Missions"],
@@ -646,8 +647,8 @@ export default function Admin() {
                 ? saveEvent
                 : activeTab === "ministries"
                   ? saveMinistry
-                  : activeTab === "leaders"
-                    ? saveLeader
+                  : activeTab === "leadership"
+                    ? saveLeadership
                     : activeTab === "sermons"
                       ? saveSermon
                       : activeTab === "choir"
@@ -780,30 +781,40 @@ export default function Admin() {
               </>
             )}
 
-            {activeTab === "leaders" && (
-              <>
-                <h3>Add leader</h3>
-                <label>
-                  Name
-                  <input value={leaderDraft.name} onChange={(event) => setLeaderDraft({ ...leaderDraft, name: event.target.value })} />
-                </label>
-                <label>
-                  Role
-                  <input value={leaderDraft.role} onChange={(event) => setLeaderDraft({ ...leaderDraft, role: event.target.value })} />
-                </label>
-                <label>
-                  Bio
-                  <textarea rows="4" value={leaderDraft.bio} onChange={(event) => setLeaderDraft({ ...leaderDraft, bio: event.target.value })} />
-                </label>
-                <label>
-                  Photo URL
-                  <input value={leaderDraft.photo} onChange={(event) => setLeaderDraft({ ...leaderDraft, photo: event.target.value })} placeholder="Enter URL or upload a file below" />
-                </label>
-                <label>
-                  Upload Photo
-                  <input type="file" accept="image/*" onChange={(e) => handleImageUpload(e, (url) => setLeaderDraft({ ...leaderDraft, photo: url }))} />
-                </label>
-              </>
+            {activeTab === "leadership" && (
+              <div className="admin-card">
+                <h2>{editingLeadershipId ? "Edit Leadership" : "Add Leadership"}</h2>
+                <div className="form-group">
+                  <label>Name</label>
+                  <input value={leadershipDraft.name} onChange={(event) => setLeadershipDraft({ ...leadershipDraft, name: event.target.value })} required />
+                </div>
+                <div className="form-group">
+                  <label>Role</label>
+                  <input value={leadershipDraft.role} onChange={(event) => setLeadershipDraft({ ...leadershipDraft, role: event.target.value })} required />
+                </div>
+                <div className="form-group">
+                  <label>Bio</label>
+                  <textarea value={leadershipDraft.bio} onChange={(event) => setLeadershipDraft({ ...leadershipDraft, bio: event.target.value })} rows="3" />
+                </div>
+                <div className="form-group">
+                  <label>Photo URL</label>
+                  <input value={leadershipDraft.photo} onChange={(event) => setLeadershipDraft({ ...leadershipDraft, photo: event.target.value })} />
+                </div>
+                <div className="form-actions">
+                  {editingLeadershipId && (
+                    <button
+                      type="button"
+                      className="btn btn-secondary"
+                      onClick={() => {
+                        setEditingLeadershipId(null);
+                        setLeadershipDraft({ name: "", role: "", bio: "", photo: "" });
+                      }}
+                    >
+                      Cancel Edit
+                    </button>
+                  )}
+                </div>
+              </div>
             )}
 
             {activeTab === "sermons" && (
@@ -940,8 +951,8 @@ export default function Admin() {
                   <div className="admin-overview__label">Ministries</div>
                 </div>
                 <div className="admin-overview__item">
-                  <div className="admin-overview__value">{stats.leaders}</div>
-                  <div className="admin-overview__label">Leaders</div>
+                  <div className="admin-overview__value">{stats.leadership}</div>
+                  <div className="admin-overview__label">Leadership</div>
                 </div>
                 <div className="admin-overview__item">
                   <div className="admin-overview__value">{stats.sermons}</div>
@@ -1026,19 +1037,24 @@ export default function Admin() {
               </div>
             ))}
 
-            {activeTab === "leaders" && (data.leadership || []).map((item) => (
-              <div key={item.id} className="admin-list__row">
-                <div>
-                  <strong>{item.name}</strong>
+            {activeTab === "leadership" && (data.leadership || []).map((item) => (
+              <div key={item.id} className="list-item">
+                <div className="list-item-content">
+                  <h4>{item.name}</h4>
                   <p>{item.role}</p>
                 </div>
-                <div className="admin-list__actions">
-                  <span className="admin-list__meta">{item.bio}</span>
-                  <button className="admin-delete" type="button" onClick={() => {
-                    setLeaderDraft({ name: item.name, role: item.role || "", bio: item.bio || "", photo: item.photo || "" });
-                    setEditingLeaderId(item.id);
-                  }}>Edit</button>
-                  <button className="admin-delete" type="button" onClick={() => deleteLeader(item.id)}>Delete</button>
+                <div className="list-item-actions">
+                  <button
+                    className="btn btn-edit"
+                    onClick={() => {
+                      setEditingLeadershipId(item.id);
+                      setLeadershipDraft({ name: item.name, role: item.role, bio: item.bio || "", photo: item.photo || "" });
+                      window.scrollTo(0, 0);
+                    }}
+                  >
+                    Edit
+                  </button>
+                  <button className="btn btn-delete" onClick={() => deleteLeadership(item.id)}>Delete</button>
                 </div>
               </div>
             ))}

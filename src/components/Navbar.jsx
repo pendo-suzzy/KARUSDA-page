@@ -8,7 +8,7 @@ const LINKS = [
     label: "Home",
     dropdown: [
       { to: "/#announcements", label: "Announcements" },
-      { to: "/#leaders", label: "Leaders" },
+      { to: "/#leadership", label: "Leadership" },
       { to: "/#sermons", label: "Sermons" }
     ]
   },
