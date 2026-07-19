@@ -617,7 +617,7 @@ export default function Admin() {
           </div>
           <div style={{ textAlign: "right" }}>
             <p className="admin-login__hint">Admin dashboard</p>
-            <button onClick={handleSignOut} className="footer__submit-btn" style={{ marginTop: "0.5rem", padding: "0.5rem 1rem" }}>Sign Out</button>
+          <button onClick={handleSignOut} className="footer__submit-btn" style={{ marginTop: "0.5rem", padding: "0.5rem 1rem" }}>Sign Out</button>
           </div>
         </div>
 
@@ -626,7 +626,6 @@ export default function Admin() {
             ["announcements", "Announcements"],
             ["events", "Events"],
             ["ministries", "Ministries"],
-            ["leaders", "Leaders"],
             ["leadership", "Leadership"],
             ["sermons", "Sermons"],
             ["choir", "Choir"],
@@ -799,6 +798,10 @@ export default function Admin() {
                 <div className="form-group">
                   <label>Photo URL</label>
                   <input value={leadershipDraft.photo} onChange={(event) => setLeadershipDraft({ ...leadershipDraft, photo: event.target.value })} />
+                </div>
+                <div className="form-group">
+                  <label>Upload Photo</label>
+                  <input type="file" accept="image/*" onChange={(e) => handleImageUpload(e, (url) => setLeadershipDraft({ ...leadershipDraft, photo: url }))} />
                 </div>
                 <div className="form-actions">
                   {editingLeadershipId && (
