@@ -32,6 +32,11 @@ export default function Events() {
                   <span className="event-card__date">{service.date}</span>
                   <span className="event-card__time">{service.time}</span>
                 </div>
+                {service.imageUrl && (
+                  <div className="event-card__image-wrap">
+                    <img src={service.imageUrl} alt={service.title} className="event-card__image" />
+                  </div>
+                )}
                 <div className="event-card__body">
                   <h3>{service.title}</h3>
                   <p>{service.description}</p>
@@ -53,6 +58,11 @@ export default function Events() {
                   <span className="event-card__date">{gathering.date}</span>
                   <span className="event-card__time">{gathering.time}</span>
                 </div>
+                {gathering.imageUrl && (
+                  <div className="event-card__image-wrap">
+                    <img src={gathering.imageUrl} alt={gathering.title} className="event-card__image" />
+                  </div>
+                )}
                 <div className="event-card__body">
                   <h3>{gathering.title}</h3>
                   <p>{gathering.description}</p>

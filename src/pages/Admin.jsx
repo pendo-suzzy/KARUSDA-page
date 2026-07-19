@@ -7,10 +7,10 @@ import "./Admin.css";
 export default function Admin() {
   const { data, setData, syncItem, removeItem, getUniqueId } = useApp();
   const [activeTab, setActiveTab] = useState("announcements");
-  const [announcementDraft, setAnnouncementDraft] = useState({ title: "", body: "", date: "" });
+  const [announcementDraft, setAnnouncementDraft] = useState({ title: "", body: "", date: "", imageUrl: "" });
   const [missionDraft, setMissionDraft] = useState({ title: "", year: "", summary: "", goalKes: "", raisedKes: "" });
   const [galleryDraft, setGalleryDraft] = useState({ caption: "", src: "" });
-  const [eventDraft, setEventDraft] = useState({ title: "", date: "", time: "", location: "", description: "", category: "services" });
+  const [eventDraft, setEventDraft] = useState({ title: "", date: "", time: "", location: "", description: "", category: "services", imageUrl: "" });
   const [ministryDraft, setMinistryDraft] = useState({ name: "", tagline: "", description: "", meetingDay: "", meetingTime: "" });
   const [leaderDraft, setLeaderDraft] = useState({ name: "", role: "", bio: "", photo: "" });
   const [sermonDraft, setSermonDraft] = useState({ title: "", speaker: "", date: "", scripture: "", description: "", youtubeUrl: "" });
@@ -22,6 +22,41 @@ export default function Admin() {
   const [editingLeaderId, setEditingLeaderId] = useState(null);
   const [editingSermonId, setEditingSermonId] = useState(null);
   const [editingGalleryId, setEditingGalleryId] = useState(null);
+  const [isUploading, setIsUploading] = useState(false);
+
+  const handleImageUpload = async (event, callback) => {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    setIsUploading(true);
+    try {
+      const fileName = `${Date.now()}-${file.name.replace(/\s+/g, '-')}`;
+      
+      const { error } = await supabase.storage
+        .from("images")
+        .upload(fileName, file);
+
+      if (error) {
+        console.error("Upload error:", error);
+        alert("Upload failed: " + error.message);
+        return;
+      }
+
+      const { data } = supabase.storage
+        .from("images")
+        .getPublicUrl(fileName);
+
+      if (data && data.publicUrl) {
+        callback(data.publicUrl);
+        alert("Image uploaded successfully!");
+      }
+    } catch (err) {
+      console.error(err);
+      alert("An unexpected error occurred during upload.");
+    } finally {
+      setIsUploading(false);
+    }
+  };
 
   const normalizedGalleryUrl = normalizeUrl(galleryDraft.src?.trim());
   const normalizedSermonUrl = normalizeUrl(sermonDraft.youtubeUrl?.trim());
@@ -88,6 +123,7 @@ export default function Admin() {
       title: announcementDraft.title,
       body: announcementDraft.body,
       date: announcementDraft.date || new Date().toISOString(),
+      imageUrl: announcementDraft.imageUrl || "",
       likes: 0,
     };
     setData((current) => {
@@ -100,6 +136,7 @@ export default function Admin() {
               title: announcementDraft.title,
               body: announcementDraft.body,
               date: announcementDraft.date || item.date,
+              imageUrl: announcementDraft.imageUrl || item.imageUrl || "",
             }
             : item)),
         };
@@ -114,7 +151,7 @@ export default function Admin() {
       };
     });
     await persistItem({ table: "announcements", item: announcement });
-    setAnnouncementDraft({ title: "", body: "", date: "" });
+    setAnnouncementDraft({ title: "", body: "", date: "", imageUrl: "" });
     setEditingAnnouncementId(null);
   };
 
@@ -125,7 +162,7 @@ export default function Admin() {
     }));
     removePersistedItem({ table: "announcements", id: itemId });
     if (editingAnnouncementId === itemId) {
-      setAnnouncementDraft({ title: "", body: "", date: "" });
+      setAnnouncementDraft({ title: "", body: "", date: "", imageUrl: "" });
       setEditingAnnouncementId(null);
     }
   };
@@ -247,6 +284,7 @@ export default function Admin() {
       time: eventDraft.time,
       location: eventDraft.location,
       description: eventDraft.description,
+      imageUrl: eventDraft.imageUrl || "",
       category: eventDraft.category,
       ...(eventDraft.category === "gatherings" ? { isSabbathEve: false } : {}),
     };
@@ -264,6 +302,7 @@ export default function Admin() {
           time: eventDraft.time,
           location: eventDraft.location,
           description: eventDraft.description,
+          imageUrl: eventDraft.imageUrl || "",
           ...(category === "gatherings" ? { isSabbathEve: false } : {}),
         };
         nextEvents[category] = [updatedEvent, ...(nextEvents[category] || [])];
@@ -288,7 +327,7 @@ export default function Admin() {
     if (!editingEventId) {
       await persistItem({ table: "events", item: newEvent });
     }
-    setEventDraft({ title: "", date: "", time: "", location: "", description: "", category: eventDraft.category });
+    setEventDraft({ title: "", date: "", time: "", location: "", description: "", category: eventDraft.category, imageUrl: "" });
     setEditingEventId(null);
   };
 
@@ -302,7 +341,7 @@ export default function Admin() {
     }));
     removePersistedItem({ table: "events", id: itemId });
     if (editingEventId === itemId) {
-      setEventDraft({ title: "", date: "", time: "", location: "", description: "", category: "services" });
+      setEventDraft({ title: "", date: "", time: "", location: "", description: "", category: "services", imageUrl: "" });
       setEditingEventId(null);
     }
   };
@@ -632,6 +671,14 @@ export default function Admin() {
                   Body
                   <textarea rows="4" value={announcementDraft.body} onChange={(event) => setAnnouncementDraft({ ...announcementDraft, body: event.target.value })} />
                 </label>
+                <label>
+                  Image URL (Optional)
+                  <input value={announcementDraft.imageUrl} onChange={(event) => setAnnouncementDraft({ ...announcementDraft, imageUrl: event.target.value })} placeholder="Enter URL or upload a file below" />
+                </label>
+                <label>
+                  Upload Image
+                  <input type="file" accept="image/*" onChange={(e) => handleImageUpload(e, (url) => setAnnouncementDraft({ ...announcementDraft, imageUrl: url }))} />
+                </label>
               </>
             )}
 
@@ -694,6 +741,14 @@ export default function Admin() {
                   Description
                   <textarea rows="4" value={eventDraft.description} onChange={(event) => setEventDraft({ ...eventDraft, description: event.target.value })} />
                 </label>
+                <label>
+                  Image URL (Optional)
+                  <input value={eventDraft.imageUrl} onChange={(event) => setEventDraft({ ...eventDraft, imageUrl: event.target.value })} placeholder="Enter URL or upload a file below" />
+                </label>
+                <label>
+                  Upload Image
+                  <input type="file" accept="image/*" onChange={(e) => handleImageUpload(e, (url) => setEventDraft({ ...eventDraft, imageUrl: url }))} />
+                </label>
               </>
             )}
 
@@ -742,7 +797,11 @@ export default function Admin() {
                 </label>
                 <label>
                   Photo URL
-                  <input value={leaderDraft.photo} onChange={(event) => setLeaderDraft({ ...leaderDraft, photo: event.target.value })} />
+                  <input value={leaderDraft.photo} onChange={(event) => setLeaderDraft({ ...leaderDraft, photo: event.target.value })} placeholder="Enter URL or upload a file below" />
+                </label>
+                <label>
+                  Upload Photo
+                  <input type="file" accept="image/*" onChange={(e) => handleImageUpload(e, (url) => setLeaderDraft({ ...leaderDraft, photo: url }))} />
                 </label>
               </>
             )}
@@ -849,7 +908,11 @@ export default function Admin() {
                 </label>
                 <label>
                   Image URL
-                  <input value={galleryDraft.src} onChange={(event) => setGalleryDraft({ ...galleryDraft, src: event.target.value })} />
+                  <input value={galleryDraft.src} onChange={(event) => setGalleryDraft({ ...galleryDraft, src: event.target.value })} placeholder="Enter URL or upload a file below" />
+                </label>
+                <label>
+                  Upload Image
+                  <input type="file" accept="image/*" onChange={(e) => handleImageUpload(e, (url) => setGalleryDraft({ ...galleryDraft, src: url }))} />
                 </label>
                 <p className="admin-form__preview">
                   Normalized link: <code>{normalizedGalleryUrl || "Enter an image link above"}</code>
@@ -904,7 +967,7 @@ export default function Admin() {
                 <div className="admin-list__actions">
                   <span className="admin-list__meta">{item.date}</span>
                   <button className="admin-delete" type="button" onClick={() => {
-                    setAnnouncementDraft({ title: item.title, body: item.body, date: item.date || "" });
+                    setAnnouncementDraft({ title: item.title, body: item.body, date: item.date || "", imageUrl: item.imageUrl || "" });
                     setEditingAnnouncementId(item.id);
                   }}>Edit</button>
                   <button className="admin-delete" type="button" onClick={() => deleteAnnouncement(item.id)}>Delete</button>
@@ -938,7 +1001,7 @@ export default function Admin() {
                 <div className="admin-list__actions">
                   <span className="admin-list__meta">{item.date}</span>
                   <button className="admin-delete" type="button" onClick={() => {
-                    setEventDraft({ title: item.title, date: item.date || "", time: item.time || "", location: item.location || "", description: item.description || "", category: item.category || "services" });
+                    setEventDraft({ title: item.title, date: item.date || "", time: item.time || "", location: item.location || "", description: item.description || "", category: item.category || "services", imageUrl: item.imageUrl || "" });
                     setEditingEventId(item.id);
                   }}>Edit</button>
                   <button className="admin-delete" type="button" onClick={() => deleteEvent(item.id)}>Delete</button>

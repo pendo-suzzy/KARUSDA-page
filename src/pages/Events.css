@@ -45,6 +45,21 @@
   font-family: var(--font-mono);
 }
 
+.event-card__image-wrap {
+  width: 140px;
+  height: 90px;
+  flex-shrink: 0;
+  border-radius: calc(var(--radius) - 4px);
+  overflow: hidden;
+  margin-right: 1rem;
+}
+
+.event-card__image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
 .event-card__date {
   font-weight: 700;
   font-size: 0.9rem;

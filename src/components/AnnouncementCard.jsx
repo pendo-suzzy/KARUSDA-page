@@ -31,6 +31,9 @@ export default function AnnouncementCard({ announcement }) {
   return (
     <article className="announcement-card">
       <p className="announcement-card__date">{formatDate(announcement.date)}</p>
+      {announcement.imageUrl && (
+        <img src={announcement.imageUrl} alt={announcement.title} className="announcement-card__image" />
+      )}
       <h3 className="announcement-card__title">{announcement.title}</h3>
       <p className="announcement-card__body">{announcement.body}</p>
       <button
