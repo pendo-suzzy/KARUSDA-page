@@ -12,13 +12,21 @@ const LINKS = [
       { to: "/#sermons", label: "Sermons" }
     ]
   },
-  { to: "/events", label: "Events" },
+  {
+    to: "/events",
+    label: "Events",
+    dropdown: [
+      { to: "/events", label: "Events" },
+      { to: "/events#gallery", label: "Gallery" }
+    ]
+  },
   {
     to: "/ministries",
     label: "Ministries",
     dropdown: [
       { to: "/ministries#ministries", label: "Ministries" },
-      { to: "/ministries#choir", label: "Choir" }
+      { to: "/ministries#choir", label: "Choir" },
+      { to: "/ministries#sermons", label: "Sermons" }
     ]
   },
   { to: "/missions", label: "Missions" },

@@ -106,7 +106,7 @@ export default function Events() {
         </div>
       </section>
 
-      <section className="section gallery">
+      <section id="gallery" className="section gallery">
         <div className="container">
           <div className="gallery__header">
             <h2 className="section__title gallery__title">Gallery</h2>

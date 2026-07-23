@@ -136,7 +136,7 @@ export default function Ministries() {
         </div>
       </section>
 
-      <section className="section">
+      <section id="sermons" className="section">
         <div className="container">
           <h2 className="section__title">Latest sermons</h2>
           <div className="sermon-grid">

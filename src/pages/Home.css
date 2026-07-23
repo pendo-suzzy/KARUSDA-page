@@ -517,7 +517,7 @@
 .sermon-card__thumb-wrap {
   position: relative;
   width: 100%;
-  aspect-ratio: 16 / 9;
+  aspect-ratio: 16 / 11.25;
   background: var(--ink);
   overflow: hidden;
 }
