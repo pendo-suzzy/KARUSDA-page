@@ -7,7 +7,7 @@ import "./Admin.css";
 export default function Admin() {
   const { data, setData, syncItem, removeItem, getUniqueId } = useApp();
   const [activeTab, setActiveTab] = useState("announcements");
-  const [announcementDraft, setAnnouncementDraft] = useState({ title: "", body: "", date: "", imageUrl: "" });
+  const [announcementDraft, setAnnouncementDraft] = useState({ title: "", body: "", date: "", imageUrl: "", documentUrl: "" });
   const [missionDraft, setMissionDraft] = useState({ title: "", year: "", summary: "", goalKes: "", raisedKes: "", documentUrl: "" });
   const [galleryDraft, setGalleryDraft] = useState({ caption: "", src: "" });
   const [eventDraft, setEventDraft] = useState({ title: "", date: "", time: "", location: "", description: "", category: "services", imageUrl: "", documentUrl: "" });
@@ -124,6 +124,7 @@ export default function Admin() {
       body: announcementDraft.body,
       date: announcementDraft.date || new Date().toISOString(),
       imageUrl: announcementDraft.imageUrl || "",
+      documentUrl: announcementDraft.documentUrl || "",
       likes: 0,
     };
     setData((current) => {
@@ -137,6 +138,7 @@ export default function Admin() {
               body: announcementDraft.body,
               date: announcementDraft.date || item.date,
               imageUrl: announcementDraft.imageUrl || item.imageUrl || "",
+              documentUrl: announcementDraft.documentUrl || item.documentUrl || "",
             }
             : item)),
         };
@@ -151,7 +153,7 @@ export default function Admin() {
       };
     });
     await persistItem({ table: "announcements", item: announcement });
-    setAnnouncementDraft({ title: "", body: "", date: "", imageUrl: "" });
+    setAnnouncementDraft({ title: "", body: "", date: "", imageUrl: "", documentUrl: "" });
     setEditingAnnouncementId(null);
   };
 
@@ -162,7 +164,7 @@ export default function Admin() {
     }));
     removePersistedItem({ table: "announcements", id: itemId });
     if (editingAnnouncementId === itemId) {
-      setAnnouncementDraft({ title: "", body: "", date: "", imageUrl: "" });
+      setAnnouncementDraft({ title: "", body: "", date: "", imageUrl: "", documentUrl: "" });
       setEditingAnnouncementId(null);
     }
   };
@@ -684,6 +686,11 @@ export default function Admin() {
                   Upload Image
                   <input type="file" accept="image/*" onChange={(e) => handleFileUpload(e, "announcements", (url) => setAnnouncementDraft({ ...announcementDraft, imageUrl: url }))} />
                 </label>
+                <label>
+                  Upload Document
+                  <input type="file" accept=".pdf,.doc,.docx,.txt" onChange={(e) => handleFileUpload(e, "announcements", (url) => setAnnouncementDraft({ ...announcementDraft, documentUrl: url }))} />
+                </label>
+                {announcementDraft.documentUrl && <p className="admin-form__preview">Document attached: <code>{announcementDraft.documentUrl}</code></p>}
               </>
             )}
 
@@ -970,7 +977,7 @@ export default function Admin() {
                 <div className="admin-list__actions">
                   <span className="admin-list__meta">{item.date}</span>
                   <button className="admin-delete" type="button" onClick={() => {
-                    setAnnouncementDraft({ title: item.title, body: item.body, date: item.date || "", imageUrl: item.imageUrl || "" });
+                    setAnnouncementDraft({ title: item.title, body: item.body, date: item.date || "", imageUrl: item.imageUrl || "", documentUrl: item.documentUrl || "" });
                     setEditingAnnouncementId(item.id);
                   }}>Edit</button>
                   <button className="admin-delete" type="button" onClick={() => deleteAnnouncement(item.id)}>Delete</button>

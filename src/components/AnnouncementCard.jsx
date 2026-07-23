@@ -36,6 +36,11 @@ export default function AnnouncementCard({ announcement }) {
       )}
       <h3 className="announcement-card__title">{announcement.title}</h3>
       <p className="announcement-card__body">{announcement.body}</p>
+      {announcement.documentUrl && (
+        <a href={announcement.documentUrl} target="_blank" rel="noopener noreferrer" className="document-link" style={{ marginBottom: "1rem" }}>
+          📄 Read Document
+        </a>
+      )}
       <button
         type="button"
         className={`announcement-card__like ${justLiked ? "is-liked" : ""}`}
