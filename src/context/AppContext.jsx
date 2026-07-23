@@ -9,7 +9,7 @@ const DEFAULT_DATA = {
   events: { services: [], gatherings: [], volunteer: [] },
   gallery: [],
   ministries: [],
-  choir: { name: "KARUSDA Grand Choir", members: 62, leadName: "Bro. Daniel Mwangi", practiceTimes: [], description: "", videos: [] },
+  choir: { name: "KARUSDA Grand Choir", members: 62, practiceTimes: [], description: "", videos: [] },
   leadership: [],
   sermons: [],
   missions: { past: [], upcoming: [] },

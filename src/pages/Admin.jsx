@@ -33,7 +33,7 @@ export default function Admin() {
       const fileName = `${Date.now()}-${file.name.replace(/\s+/g, '-')}`;
 
       const { error } = await supabase.storage
-        .from("images")
+        .from("leadership")
         .upload(fileName, file);
 
       if (error) {
@@ -43,7 +43,7 @@ export default function Admin() {
       }
 
       const { data } = supabase.storage
-        .from("images")
+        .from("leadership")
         .getPublicUrl(fileName);
 
       if (data && data.publicUrl) {
