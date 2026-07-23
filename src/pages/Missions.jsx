@@ -46,6 +46,13 @@ export default function Missions() {
                     </div>
                   </>
                 )}
+                {mission.documentUrl && (
+                  <div style={{ marginTop: "1rem" }}>
+                    <a href={mission.documentUrl} target="_blank" rel="noopener noreferrer" className="document-link">
+                      📄 Read Document
+                    </a>
+                  </div>
+                )}
               </article>
             ))}
           </div>
@@ -62,6 +69,11 @@ export default function Missions() {
                 <div>
                   <h3>{mission.title}</h3>
                   <p>{mission.summary}</p>
+                  {mission.documentUrl && (
+                    <a href={mission.documentUrl} target="_blank" rel="noopener noreferrer" className="document-link">
+                      📄 Read Document
+                    </a>
+                  )}
                 </div>
               </li>
             ))}

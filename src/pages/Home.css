@@ -117,6 +117,28 @@
   max-width: 60ch;
 }
 
+.document-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.4rem 0.8rem;
+  background: rgba(201, 150, 46, 0.1);
+  color: var(--gold);
+  border: 1px solid rgba(201, 150, 46, 0.2);
+  border-radius: var(--radius);
+  font-size: 0.8rem;
+  font-weight: 500;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  width: fit-content;
+  margin-top: 0.5rem;
+}
+
+.document-link:hover {
+  background: var(--gold);
+  color: var(--paper);
+}
+
 .announcements__grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);

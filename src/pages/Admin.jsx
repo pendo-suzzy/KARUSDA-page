@@ -8,10 +8,10 @@ export default function Admin() {
   const { data, setData, syncItem, removeItem, getUniqueId } = useApp();
   const [activeTab, setActiveTab] = useState("announcements");
   const [announcementDraft, setAnnouncementDraft] = useState({ title: "", body: "", date: "", imageUrl: "" });
-  const [missionDraft, setMissionDraft] = useState({ title: "", year: "", summary: "", goalKes: "", raisedKes: "" });
+  const [missionDraft, setMissionDraft] = useState({ title: "", year: "", summary: "", goalKes: "", raisedKes: "", documentUrl: "" });
   const [galleryDraft, setGalleryDraft] = useState({ caption: "", src: "" });
-  const [eventDraft, setEventDraft] = useState({ title: "", date: "", time: "", location: "", description: "", category: "services", imageUrl: "" });
-  const [ministryDraft, setMinistryDraft] = useState({ name: "", tagline: "", description: "", meetingDay: "", meetingTime: "" });
+  const [eventDraft, setEventDraft] = useState({ title: "", date: "", time: "", location: "", description: "", category: "services", imageUrl: "", documentUrl: "" });
+  const [ministryDraft, setMinistryDraft] = useState({ name: "", tagline: "", description: "", meetingDay: "", meetingTime: "", documentUrl: "" });
   const [leadershipDraft, setLeadershipDraft] = useState({ name: "", role: "", bio: "", photo: "" });
   const [sermonDraft, setSermonDraft] = useState({ title: "", speaker: "", date: "", scripture: "", description: "", youtubeUrl: "" });
   const [choirVideoDraft, setChoirVideoDraft] = useState({ id: "", title: "", youtubeUrl: "", date: "" });
@@ -178,6 +178,7 @@ export default function Admin() {
       goalKes: Number(missionDraft.goalKes || 0),
       raisedKes: Number(missionDraft.raisedKes || 0),
       upcoming: true,
+      documentUrl: missionDraft.documentUrl || "",
     };
     setData((current) => {
       if (editingMissionId) {
@@ -193,6 +194,7 @@ export default function Admin() {
                 summary: missionDraft.summary,
                 goalKes: Number(missionDraft.goalKes || item.goalKes || 0),
                 raisedKes: Number(missionDraft.raisedKes || item.raisedKes || 0),
+                documentUrl: missionDraft.documentUrl || "",
               }
               : item)),
           },
@@ -211,7 +213,7 @@ export default function Admin() {
       };
     });
     await persistItem({ table: "missions", item: mission });
-    setMissionDraft({ title: "", year: "", summary: "", goalKes: "", raisedKes: "" });
+    setMissionDraft({ title: "", year: "", summary: "", goalKes: "", raisedKes: "", documentUrl: "" });
     setEditingMissionId(null);
   };
 
@@ -225,7 +227,7 @@ export default function Admin() {
     }));
     removePersistedItem({ table: "missions", id: itemId });
     if (editingMissionId === itemId) {
-      setMissionDraft({ title: "", year: "", summary: "", goalKes: "", raisedKes: "" });
+      setMissionDraft({ title: "", year: "", summary: "", goalKes: "", raisedKes: "", documentUrl: "" });
       setEditingMissionId(null);
     }
   };
@@ -285,6 +287,7 @@ export default function Admin() {
       location: eventDraft.location,
       description: eventDraft.description,
       imageUrl: eventDraft.imageUrl || "",
+      documentUrl: eventDraft.documentUrl || "",
       category: eventDraft.category,
       ...(eventDraft.category === "gatherings" ? { isSabbathEve: false } : {}),
     };
@@ -303,6 +306,7 @@ export default function Admin() {
           location: eventDraft.location,
           description: eventDraft.description,
           imageUrl: eventDraft.imageUrl || "",
+          documentUrl: eventDraft.documentUrl || "",
           ...(category === "gatherings" ? { isSabbathEve: false } : {}),
         };
         nextEvents[category] = [updatedEvent, ...(nextEvents[category] || [])];
@@ -327,7 +331,7 @@ export default function Admin() {
     if (!editingEventId) {
       await persistItem({ table: "events", item: newEvent });
     }
-    setEventDraft({ title: "", date: "", time: "", location: "", description: "", category: eventDraft.category, imageUrl: "" });
+    setEventDraft({ title: "", date: "", time: "", location: "", description: "", category: eventDraft.category, imageUrl: "", documentUrl: "" });
     setEditingEventId(null);
   };
 
@@ -341,7 +345,7 @@ export default function Admin() {
     }));
     removePersistedItem({ table: "events", id: itemId });
     if (editingEventId === itemId) {
-      setEventDraft({ title: "", date: "", time: "", location: "", description: "", category: "services", imageUrl: "" });
+      setEventDraft({ title: "", date: "", time: "", location: "", description: "", category: "services", imageUrl: "", documentUrl: "" });
       setEditingEventId(null);
     }
   };
@@ -356,6 +360,7 @@ export default function Admin() {
       description: ministryDraft.description,
       meetingDay: ministryDraft.meetingDay,
       meetingTime: ministryDraft.meetingTime,
+      documentUrl: ministryDraft.documentUrl || "",
     };
     setData((current) => {
       if (editingMinistryId) {
@@ -378,7 +383,7 @@ export default function Admin() {
       };
     });
     await persistItem({ table: "ministries", item: ministry });
-    setMinistryDraft({ name: "", tagline: "", description: "", meetingDay: "", meetingTime: "" });
+    setMinistryDraft({ name: "", tagline: "", description: "", meetingDay: "", meetingTime: "", documentUrl: "" });
     setEditingMinistryId(null);
   };
 
@@ -389,7 +394,7 @@ export default function Admin() {
     }));
     removePersistedItem({ table: "ministries", id: itemId });
     if (editingMinistryId === itemId) {
-      setMinistryDraft({ name: "", tagline: "", description: "", meetingDay: "", meetingTime: "" });
+      setMinistryDraft({ name: "", tagline: "", description: "", meetingDay: "", meetingTime: "", documentUrl: "" });
       setEditingMinistryId(null);
     }
   };
@@ -707,6 +712,11 @@ export default function Admin() {
                     <input type="number" value={missionDraft.raisedKes} onChange={(event) => setMissionDraft({ ...missionDraft, raisedKes: event.target.value })} />
                   </label>
                 </div>
+                <label>
+                  Upload Document
+                  <input type="file" accept=".pdf,.doc,.docx,.txt" onChange={(e) => handleFileUpload(e, "missions", (url) => setMissionDraft({ ...missionDraft, documentUrl: url }))} />
+                </label>
+                {missionDraft.documentUrl && <p className="admin-form__preview">Document attached: <code>{missionDraft.documentUrl}</code></p>}
               </>
             )}
 
@@ -749,6 +759,11 @@ export default function Admin() {
                   Upload Image
                   <input type="file" accept="image/*" onChange={(e) => handleFileUpload(e, "events", (url) => setEventDraft({ ...eventDraft, imageUrl: url }))} />
                 </label>
+                <label>
+                  Upload Document
+                  <input type="file" accept=".pdf,.doc,.docx,.txt" onChange={(e) => handleFileUpload(e, "events", (url) => setEventDraft({ ...eventDraft, documentUrl: url }))} />
+                </label>
+                {eventDraft.documentUrl && <p className="admin-form__preview">Document attached: <code>{eventDraft.documentUrl}</code></p>}
               </>
             )}
 
@@ -777,6 +792,11 @@ export default function Admin() {
                     <input value={ministryDraft.meetingTime} onChange={(event) => setMinistryDraft({ ...ministryDraft, meetingTime: event.target.value })} />
                   </label>
                 </div>
+                <label>
+                  Upload Document
+                  <input type="file" accept=".pdf,.doc,.docx,.txt" onChange={(e) => handleFileUpload(e, "ministries", (url) => setMinistryDraft({ ...ministryDraft, documentUrl: url }))} />
+                </label>
+                {ministryDraft.documentUrl && <p className="admin-form__preview">Document attached: <code>{ministryDraft.documentUrl}</code></p>}
               </>
             )}
 

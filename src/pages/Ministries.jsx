@@ -42,6 +42,11 @@ export default function Ministries() {
                 <p className="ministry-card__tagline">{ministry.tagline}</p>
                 <p className="ministry-card__desc">{ministry.description}</p>
                 <p className="ministry-card__time">{ministry.meetingDay} · {ministry.meetingTime}</p>
+                {ministry.documentUrl && (
+                  <a href={ministry.documentUrl} target="_blank" rel="noopener noreferrer" className="document-link">
+                    📄 Read Document
+                  </a>
+                )}
               </article>
             ))}
           </div>
@@ -57,6 +62,11 @@ export default function Ministries() {
                 <h3>{group.title}</h3>
                 <p className="fellowship-card__time">{group.time}</p>
                 <p>{group.description}</p>
+                {group.documentUrl && (
+                  <a href={group.documentUrl} target="_blank" rel="noopener noreferrer" className="document-link">
+                    📄 Read Document
+                  </a>
+                )}
               </article>
             ))}
           </div>

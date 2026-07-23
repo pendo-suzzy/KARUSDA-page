@@ -41,6 +41,11 @@ export default function Events() {
                   <h3>{service.title}</h3>
                   <p>{service.description}</p>
                   <div className="event-card__location">{service.location}</div>
+                  {service.documentUrl && (
+                    <a href={service.documentUrl} target="_blank" rel="noopener noreferrer" className="document-link">
+                      📄 Read Document
+                    </a>
+                  )}
                 </div>
               </article>
             ))}
@@ -67,6 +72,11 @@ export default function Events() {
                   <h3>{gathering.title}</h3>
                   <p>{gathering.description}</p>
                   <div className="event-card__location">{gathering.location}</div>
+                  {gathering.documentUrl && (
+                    <a href={gathering.documentUrl} target="_blank" rel="noopener noreferrer" className="document-link">
+                      📄 Read Document
+                    </a>
+                  )}
                 </div>
               </article>
             ))}
@@ -99,6 +109,11 @@ export default function Events() {
                   <h3>{item.title}</h3>
                   <p>{item.description}</p>
                   <div className="event-card__location">{item.location}</div>
+                  {item.documentUrl && (
+                    <a href={item.documentUrl} target="_blank" rel="noopener noreferrer" className="document-link">
+                      📄 Read Document
+                    </a>
+                  )}
                 </div>
               </article>
             ))}
