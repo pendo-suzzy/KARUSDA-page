@@ -858,47 +858,8 @@ export default function Admin() {
             )}
 
             {activeTab === "choir" && (
-              <>
-                <h3>Manage choir videos</h3>
-                <h4>Existing videos</h4>
-                {(data.choir?.videos || []).map((video) => (
-                  <div key={video.id} className="admin-list__row">
-                    <div>
-                      <strong>{video.title}</strong>
-                      <p>
-                        {video.youtubeUrl ? (
-                          <a href={video.youtubeUrl} target="_blank" rel="noopener noreferrer">
-                            {video.youtubeUrl}
-                          </a>
-                        ) : (
-                          "No video URL provided"
-                        )}
-                      </p>
-                    </div>
-                    <div>
-                      <button
-                        className="footer__submit-btn"
-                        type="button"
-                        onClick={() => setChoirVideoDraft({
-                          id: video.id,
-                          title: video.title,
-                          youtubeUrl: video.youtubeUrl,
-                          date: video.date || "",
-                        })}
-                      >
-                        Edit
-                      </button>
-                      <button
-                        className="footer__submit-btn"
-                        type="button"
-                        onClick={() => deleteChoirVideo(video.id)}
-                        style={{ marginLeft: "0.5rem" }}
-                      >
-                        Delete
-                      </button>
-                    </div>
-                  </div>
-                ))}
+              <div className="admin-card">
+                <h2>{choirVideoDraft.id ? "Edit Choir Video" : "Add Choir Video"}</h2>
                 <label>
                   Video title
                   <input value={choirVideoDraft.title} onChange={(event) => setChoirVideoDraft({ ...choirVideoDraft, title: event.target.value })} />
@@ -918,7 +879,7 @@ export default function Admin() {
                 <p className="admin-form__preview">
                   Normalized link: <code>{normalizedChoirUrl || "Enter or upload a video link above"}</code>
                 </p>
-              </>
+              </div>
             )}
 
             {activeTab === "gallery" && (
@@ -1088,13 +1049,44 @@ export default function Admin() {
             ))}
 
             {activeTab === "choir" && (
-              <div className="admin-list__row">
-                <div>
-                  <strong>{data.choir?.name}</strong>
-                  <p>{data.choir?.description}</p>
+              <>
+                <div className="admin-list__row" style={{ borderBottom: '2px solid var(--line)', paddingBottom: '1rem', marginBottom: '1rem' }}>
+                  <div>
+                    <strong>{data.choir?.name}</strong>
+                    <p>{data.choir?.description}</p>
+                  </div>
+                  <span className="admin-list__meta">{data.choir?.members} members</span>
                 </div>
-                <span className="admin-list__meta">{data.choir?.members} members</span>
-              </div>
+                {(data.choir?.videos || []).map((video) => (
+                  <div key={video.id} className="admin-list__row">
+                    <div>
+                      <strong>{video.title}</strong>
+                      <p style={{ margin: "0.25rem 0 0", fontSize: "0.85rem" }}>
+                        {video.youtubeUrl ? (
+                          <a href={video.youtubeUrl} target="_blank" rel="noopener noreferrer">
+                            {video.youtubeUrl.length > 50 ? video.youtubeUrl.substring(0, 50) + "..." : video.youtubeUrl}
+                          </a>
+                        ) : (
+                          "No video URL provided"
+                        )}
+                      </p>
+                    </div>
+                    <div className="admin-list__actions">
+                      <span className="admin-list__meta">{video.date}</span>
+                      <button className="admin-delete" type="button" onClick={() => {
+                        setChoirVideoDraft({
+                          id: video.id,
+                          title: video.title,
+                          youtubeUrl: video.youtubeUrl,
+                          date: video.date || "",
+                        });
+                        window.scrollTo(0, 0);
+                      }}>Edit</button>
+                      <button className="admin-delete" type="button" onClick={() => deleteChoirVideo(video.id)}>Delete</button>
+                    </div>
+                  </div>
+                ))}
+              </>
             )}
 
             {activeTab === "gallery" && (data.gallery || []).map((item) => (
