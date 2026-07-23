@@ -24,7 +24,7 @@ export default function Admin() {
   const [editingGalleryId, setEditingGalleryId] = useState(null);
   const [isUploading, setIsUploading] = useState(false);
 
-  const handleImageUpload = async (event, callback) => {
+  const handleFileUpload = async (event, bucketName, callback) => {
     const file = event.target.files[0];
     if (!file) return;
 
@@ -33,7 +33,7 @@ export default function Admin() {
       const fileName = `${Date.now()}-${file.name.replace(/\s+/g, '-')}`;
 
       const { error } = await supabase.storage
-        .from("leadership")
+        .from("events")
         .upload(fileName, file);
 
       if (error) {
@@ -43,7 +43,7 @@ export default function Admin() {
       }
 
       const { data } = supabase.storage
-        .from("leadership")
+        .from("events")
         .getPublicUrl(fileName);
 
       if (data && data.publicUrl) {
@@ -677,7 +677,7 @@ export default function Admin() {
                 </label>
                 <label>
                   Upload Image
-                  <input type="file" accept="image/*" onChange={(e) => handleImageUpload(e, (url) => setAnnouncementDraft({ ...announcementDraft, imageUrl: url }))} />
+                  <input type="file" accept="image/*" onChange={(e) => handleFileUpload(e, "announcements", (url) => setAnnouncementDraft({ ...announcementDraft, imageUrl: url }))} />
                 </label>
               </>
             )}
@@ -747,7 +747,7 @@ export default function Admin() {
                 </label>
                 <label>
                   Upload Image
-                  <input type="file" accept="image/*" onChange={(e) => handleImageUpload(e, (url) => setEventDraft({ ...eventDraft, imageUrl: url }))} />
+                  <input type="file" accept="image/*" onChange={(e) => handleFileUpload(e, "events", (url) => setEventDraft({ ...eventDraft, imageUrl: url }))} />
                 </label>
               </>
             )}
@@ -801,7 +801,7 @@ export default function Admin() {
                 </div>
                 <div className="form-group">
                   <label>Upload Photo</label>
-                  <input type="file" accept="image/*" onChange={(e) => handleImageUpload(e, (url) => setLeadershipDraft({ ...leadershipDraft, photo: url }))} />
+                  <input type="file" accept="image/*" onChange={(e) => handleFileUpload(e, "leadership", (url) => setLeadershipDraft({ ...leadershipDraft, photo: url }))} />
                 </div>
                 <div className="form-actions">
                   {editingLeadershipId && (
@@ -844,11 +844,15 @@ export default function Admin() {
                   <textarea rows="4" value={sermonDraft.description} onChange={(event) => setSermonDraft({ ...sermonDraft, description: event.target.value })} />
                 </label>
                 <label>
-                  YouTube URL
+                  Video URL (YouTube or Direct)
                   <input value={sermonDraft.youtubeUrl} onChange={(event) => setSermonDraft({ ...sermonDraft, youtubeUrl: event.target.value })} />
                 </label>
+                <label>
+                  Upload Video
+                  <input type="file" accept="video/*" onChange={(e) => handleFileUpload(e, "sermons", (url) => setSermonDraft({ ...sermonDraft, youtubeUrl: url }))} />
+                </label>
                 <p className="admin-form__preview">
-                  Normalized link: <code>{normalizedSermonUrl || "Enter a YouTube link above"}</code>
+                  Normalized link: <code>{normalizedSermonUrl || "Enter or upload a video link above"}</code>
                 </p>
               </>
             )}
@@ -904,11 +908,15 @@ export default function Admin() {
                   <input type="date" value={choirVideoDraft.date} onChange={(event) => setChoirVideoDraft({ ...choirVideoDraft, date: event.target.value })} />
                 </label>
                 <label>
-                  YouTube URL
+                  Video URL (YouTube or Direct)
                   <input value={choirVideoDraft.youtubeUrl} onChange={(event) => setChoirVideoDraft({ ...choirVideoDraft, youtubeUrl: event.target.value })} />
                 </label>
+                <label>
+                  Upload Video
+                  <input type="file" accept="video/*" onChange={(e) => handleFileUpload(e, "choir", (url) => setChoirVideoDraft({ ...choirVideoDraft, youtubeUrl: url }))} />
+                </label>
                 <p className="admin-form__preview">
-                  Normalized link: <code>{normalizedChoirUrl || "Enter a YouTube link above"}</code>
+                  Normalized link: <code>{normalizedChoirUrl || "Enter or upload a video link above"}</code>
                 </p>
               </>
             )}
@@ -926,7 +934,7 @@ export default function Admin() {
                 </label>
                 <label>
                   Upload Image
-                  <input type="file" accept="image/*" onChange={(e) => handleImageUpload(e, (url) => setGalleryDraft({ ...galleryDraft, src: url }))} />
+                  <input type="file" accept="image/*" onChange={(e) => handleFileUpload(e, "gallery", (url) => setGalleryDraft({ ...galleryDraft, src: url }))} />
                 </label>
                 <p className="admin-form__preview">
                   Normalized link: <code>{normalizedGalleryUrl || "Enter an image link above"}</code>
