@@ -13,8 +13,8 @@ export default function Admin() {
   const [eventDraft, setEventDraft] = useState({ title: "", date: "", time: "", location: "", description: "", category: "services", imageUrl: "", documentUrl: "" });
   const [ministryDraft, setMinistryDraft] = useState({ name: "", tagline: "", description: "", meetingDay: "", meetingTime: "", documentUrl: "" });
   const [leadershipDraft, setLeadershipDraft] = useState({ name: "", role: "", bio: "", photo: "" });
-  const [sermonDraft, setSermonDraft] = useState({ title: "", speaker: "", date: "", scripture: "", description: "", youtubeUrl: "" });
-  const [choirVideoDraft, setChoirVideoDraft] = useState({ id: "", title: "", youtubeUrl: "", date: "" });
+  const [sermonDraft, setSermonDraft] = useState({ title: "", speaker: "", date: "", scripture: "", description: "", youtubeUrl: "", documentUrl: "" });
+  const [choirVideoDraft, setChoirVideoDraft] = useState({ id: "", title: "", youtubeUrl: "", date: "", imageUrl: "" });
   const [editingAnnouncementId, setEditingAnnouncementId] = useState(null);
   const [editingMissionId, setEditingMissionId] = useState(null);
   const [editingEventId, setEditingEventId] = useState(null);
@@ -463,6 +463,7 @@ export default function Admin() {
       scripture: sermonDraft.scripture,
       youtubeUrl: normalizedLink,
       description: sermonDraft.description,
+      documentUrl: sermonDraft.documentUrl || "",
     };
     setData((current) => {
       if (editingSermonId) {
@@ -485,7 +486,7 @@ export default function Admin() {
       };
     });
     await persistItem({ table: "sermons", item: sermon });
-    setSermonDraft({ title: "", speaker: "", date: "", scripture: "", description: "", youtubeUrl: "" });
+    setSermonDraft({ title: "", speaker: "", date: "", scripture: "", description: "", youtubeUrl: "", documentUrl: "" });
     setEditingSermonId(null);
   };
 
@@ -496,7 +497,7 @@ export default function Admin() {
     }));
     removePersistedItem({ table: "sermons", id: itemId });
     if (editingSermonId === itemId) {
-      setSermonDraft({ title: "", speaker: "", date: "", scripture: "", description: "", youtubeUrl: "" });
+      setSermonDraft({ title: "", speaker: "", date: "", scripture: "", description: "", youtubeUrl: "", documentUrl: "" });
       setEditingSermonId(null);
     }
   };
@@ -510,6 +511,7 @@ export default function Admin() {
       title: choirVideoDraft.title,
       youtubeUrl: normalizedLink,
       date: choirVideoDraft.date,
+      imageUrl: choirVideoDraft.imageUrl || "",
     };
 
     setData((current) => {
@@ -879,6 +881,10 @@ export default function Admin() {
                   Upload Video
                   <input type="file" accept="video/*" onChange={(e) => handleFileUpload(e, "sermons", (url) => setSermonDraft({ ...sermonDraft, youtubeUrl: url }))} />
                 </label>
+                <label>
+                  Upload Document (PDF/Word)
+                  <input type="file" accept=".pdf,.doc,.docx" onChange={(e) => handleFileUpload(e, "sermons", (url) => setSermonDraft({ ...sermonDraft, documentUrl: url }))} />
+                </label>
                 <p className="admin-form__preview">
                   Normalized link: <code>{normalizedSermonUrl || "Enter or upload a video link above"}</code>
                 </p>
@@ -903,6 +909,10 @@ export default function Admin() {
                 <label>
                   Upload Video
                   <input type="file" accept="video/*" onChange={(e) => handleFileUpload(e, "choir", (url) => setChoirVideoDraft({ ...choirVideoDraft, youtubeUrl: url }))} />
+                </label>
+                <label>
+                  Upload Cover Image
+                  <input type="file" accept="image/*" onChange={(e) => handleFileUpload(e, "choir", (url) => setChoirVideoDraft({ ...choirVideoDraft, imageUrl: url }))} />
                 </label>
                 <p className="admin-form__preview">
                   Normalized link: <code>{normalizedChoirUrl || "Enter or upload a video link above"}</code>
@@ -1068,7 +1078,7 @@ export default function Admin() {
                 <div className="admin-list__actions">
                   <span className="admin-list__meta">{item.speaker}</span>
                   <button className="admin-delete" type="button" onClick={() => {
-                    setSermonDraft({ title: item.title, speaker: item.speaker || "", date: item.date || "", scripture: item.scripture || "", description: item.description || "", youtubeUrl: item.youtubeUrl || "" });
+                    setSermonDraft({ title: item.title, speaker: item.speaker || "", date: item.date || "", scripture: item.scripture || "", description: item.description || "", youtubeUrl: item.youtubeUrl || "", documentUrl: item.documentUrl || "" });
                     setEditingSermonId(item.id);
                   }}>Edit</button>
                   <button className="admin-delete" type="button" onClick={() => deleteSermon(item.id)}>Delete</button>
@@ -1107,6 +1117,7 @@ export default function Admin() {
                           title: video.title,
                           youtubeUrl: video.youtubeUrl,
                           date: video.date || "",
+                          imageUrl: video.imageUrl || "",
                         });
                         window.scrollTo(0, 0);
                       }}>Edit</button>

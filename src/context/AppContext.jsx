@@ -38,12 +38,22 @@ const normalizeItemForTable = ({ table_name, item }) => {
     normalizedItem.likes = Number(normalizedItem.likes || 0);
   }
 
-  // Prevent crashing Supabase if the user hasn't added these columns yet
-  if (!normalizedItem.documentUrl) {
+  // Map internal camelCase properties to exactly match the lowercase columns added to Supabase
+  if (normalizedItem.documentUrl !== undefined) {
+    normalizedItem.documenturl = normalizedItem.documentUrl;
     delete normalizedItem.documentUrl;
   }
-  if (!normalizedItem.imageUrl) {
+
+  if (normalizedItem.imageUrl !== undefined) {
+    normalizedItem.imageurl = normalizedItem.imageUrl;
+    if (["announcements", "events", "gallery"].includes(table_name)) {
+      normalizedItem.imageupload = normalizedItem.imageUrl;
+    }
     delete normalizedItem.imageUrl;
+  }
+
+  if (table_name === "gallery" && normalizedItem.src !== undefined && !normalizedItem.imageupload) {
+    normalizedItem.imageupload = normalizedItem.src;
   }
 
   return normalizedItem;
@@ -96,17 +106,25 @@ const normalizeTableName = (tableName) => {
   return tableName;
 };
 
+const mapRowFromDb = (row) => ({
+  ...row,
+  documentUrl: row.documenturl || row.documentUrl || "",
+  imageUrl: row.imageurl || row.imageupload || row.imageUrl || "",
+  src: row.imageupload || row.src || "",
+  youtubeUrl: row.youtubeurl || row.youtubeUrl || "",
+});
+
 const buildDataFromRows = ({ announcements, events, gallery, leadership, ministries, choir, missions, sermon }) => {
   const data = { ...DEFAULT_DATA };
 
-  data.announcements = announcements || [];
-  data.gallery = gallery || [];
-  data.ministries = ministries || [];
-  data.leadership = leadership || [];
-  data.sermons = sermon || [];
+  data.announcements = (announcements || []).map(mapRowFromDb);
+  data.gallery = (gallery || []).map(mapRowFromDb);
+  data.ministries = (ministries || []).map(mapRowFromDb);
+  data.leadership = (leadership || []).map(mapRowFromDb);
+  data.sermons = (sermon || []).map(mapRowFromDb);
   data.choir = {
     ...data.choir,
-    videos: choir || [],
+    videos: (choir || []).map(mapRowFromDb),
   };
 
   data.events = {
@@ -114,7 +132,8 @@ const buildDataFromRows = ({ announcements, events, gallery, leadership, ministr
     gatherings: [],
     volunteer: [],
   };
-  (events || []).forEach((event) => {
+  (events || []).forEach((e) => {
+    const event = mapRowFromDb(e);
     const category = event.category || "services";
     data.events[category] = [...(data.events[category] || []), event];
   });
@@ -123,7 +142,8 @@ const buildDataFromRows = ({ announcements, events, gallery, leadership, ministr
     past: [],
     upcoming: [],
   };
-  (missions || []).forEach((mission) => {
+  (missions || []).forEach((m) => {
+    const mission = mapRowFromDb(m);
     if (mission.upcoming === false) {
       data.missions.past.push(mission);
     } else {

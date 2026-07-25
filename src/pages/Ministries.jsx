@@ -104,7 +104,7 @@ export default function Ministries() {
             {choir.videos?.map((video) => {
               const rawUrl = video.youtubeUrl || video.youtube_url || video.url || video.src;
               const videoLink = normalizeUrl(rawUrl);
-              const thumb = getYoutubeThumbnail(rawUrl);
+              const thumb = video.imageUrl || getYoutubeThumbnail(rawUrl);
               const cardContent = (
                 <>
                   <div className="choir-video-card__thumb-wrap">
@@ -172,6 +172,11 @@ export default function Ministries() {
                       {sermon.title} {sermonLink && <span className="sermon-card__play">▶</span>}
                     </h3>
                     <p className="sermon-card__desc">{sermon.description}</p>
+                    {sermon.documentUrl && (
+                      <a href={sermon.documentUrl} target="_blank" rel="noopener noreferrer" className="document-link" onClick={(e) => e.stopPropagation()}>
+                        📄 Read Document
+                      </a>
+                    )}
                     {sermon.speaker ? <div className="sermon-card__speaker">{sermon.speaker}</div> : null}
                   </div>
                 </>
