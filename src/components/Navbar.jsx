@@ -30,6 +30,7 @@ const LINKS = [
     ]
   },
   { to: "/missions", label: "Missions" },
+  { to: "/give", label: "Give" },
 ];
 
 export default function Navbar() {
