@@ -104,6 +104,7 @@ export default function Admin() {
       await syncItem({ table_name: table, item });
     } catch (err) {
       console.error(`Failed to persist ${table}:`, err);
+      alert(`Database save failed: ${err.message}. If you recently added new fields like Document Upload, make sure to add the 'documentUrl' column to your Supabase tables!`);
     }
   };
 

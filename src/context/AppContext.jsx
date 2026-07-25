@@ -38,6 +38,14 @@ const normalizeItemForTable = ({ table_name, item }) => {
     normalizedItem.likes = Number(normalizedItem.likes || 0);
   }
 
+  // Prevent crashing Supabase if the user hasn't added these columns yet
+  if (!normalizedItem.documentUrl) {
+    delete normalizedItem.documentUrl;
+  }
+  if (!normalizedItem.imageUrl) {
+    delete normalizedItem.imageUrl;
+  }
+
   return normalizedItem;
 };
 
@@ -149,15 +157,40 @@ const fetchAppData = async () => {
 const upsertRow = async ({ table_name, item }) => {
   const table = normalizeTableName(table_name);
   const normalizedItem = normalizeItemForTable({ table_name, item });
-  const { data, error } = await supabase
-    .from(table)
-    .upsert(normalizedItem, { onConflict: ["id"] });
+  
+  let currentItem = { ...normalizedItem };
+  let droppedColumns = [];
+  let attempt = 0;
 
-  if (error) {
-    throw error;
+  while (attempt < 5) {
+    const { data, error } = await supabase
+      .from(table)
+      .upsert(currentItem, { onConflict: ["id"] });
+
+    if (error && error.code === 'PGRST204') {
+      const match = error.message.match(/'([^']+)' column/);
+      if (match && match[1]) {
+        const missingColumn = match[1];
+        console.warn(`Column '${missingColumn}' is missing in Supabase. Retrying without it...`);
+        delete currentItem[missingColumn];
+        droppedColumns.push(missingColumn);
+        attempt++;
+        continue;
+      }
+    }
+
+    if (error) {
+      throw error;
+    }
+
+    if (droppedColumns.length > 0) {
+      alert(`Saved successfully, but the following fields were lost because they don't exist as columns in your Supabase database: ${droppedColumns.join(", ")}. Please add them as text columns!`);
+    }
+
+    return data;
   }
-
-  return data;
+  
+  throw new Error("Too many missing columns, aborting save.");
 };
 
 const deleteRow = async ({ table_name, id }) => {
