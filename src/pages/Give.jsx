@@ -47,7 +47,7 @@ export default function Give() {
           <p className="give-hero__eyebrow">Partner with us</p>
           <h1 className="give-hero__title">Give</h1>
           <p className="give-hero__subtitle">
-            Support through your tithes, offerings, and donations. 
+            Support through your tithes, offerings, and donations. <br />
             "God loves a cheerful giver." — 2 Corinthians 9:7
           </p>
         </div>
