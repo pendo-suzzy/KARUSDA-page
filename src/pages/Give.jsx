@@ -149,11 +149,11 @@ export default function Give() {
               <div className="paybill-details">
                 <div className="paybill-row">
                   <span className="paybill-label">Paybill Number:</span>
-                  <span className="paybill-value">123456</span>
+                  <span className="paybill-value">247247</span>
                 </div>
                 <div className="paybill-row">
                   <span className="paybill-label">Account Number:</span>
-                  <span className="paybill-value">Tithes / Offering</span>
+                  <span className="paybill-value">822582</span>
                 </div>
               </div>
             </div>
