@@ -9,7 +9,7 @@ export default function Admin() {
   const [activeTab, setActiveTab] = useState("announcements");
   const [announcementDraft, setAnnouncementDraft] = useState({ title: "", body: "", date: "", imageUrl: "", documentUrl: "" });
   const [missionDraft, setMissionDraft] = useState({ title: "", year: "", summary: "", goalKes: "", raisedKes: "", documentUrl: "", missionType: "upcoming" });
-  const [galleryDraft, setGalleryDraft] = useState({ caption: "", src: "" });
+  const [galleryDraft, setGalleryDraft] = useState({ caption: "", src: "", date: "" });
   const [eventDraft, setEventDraft] = useState({ title: "", dateTime: "", location: "", description: "", category: "services", imageUrl: "", documentUrl: "" });
   const [ministryDraft, setMinistryDraft] = useState({ name: "", tagline: "", description: "", dateTime: "", documentUrl: "" });
   const [leadershipDraft, setLeadershipDraft] = useState({ name: "", role: "", bio: "", photo: "" });
@@ -247,13 +247,14 @@ export default function Admin() {
       src: normalizedSrc,
       imageupload: normalizedSrc,
       caption: galleryDraft.caption,
+      date: galleryDraft.date || new Date().toISOString().split("T")[0],
     };
     setData((current) => {
       if (editingGalleryId) {
         return {
           ...current,
           gallery: (current.gallery || []).map((item) => (item.id === editingGalleryId
-            ? { ...item, src: normalizedSrc, imageupload: normalizedSrc, caption: galleryDraft.caption }
+            ? { ...item, src: normalizedSrc, imageupload: normalizedSrc, caption: galleryDraft.caption, date: galleryDraft.date || item.date }
             : item)),
         };
       }
@@ -267,7 +268,7 @@ export default function Admin() {
       };
     });
     await persistItem({ table: "gallery", item: galleryItem });
-    setGalleryDraft({ caption: "", src: "" });
+    setGalleryDraft({ caption: "", src: "", date: "" });
     setEditingGalleryId(null);
   };
 
@@ -278,7 +279,7 @@ export default function Admin() {
     }));
     removePersistedItem({ table: "gallery", id: itemId });
     if (editingGalleryId === itemId) {
-      setGalleryDraft({ caption: "", src: "" });
+      setGalleryDraft({ caption: "", src: "", date: "" });
       setEditingGalleryId(null);
     }
   };
@@ -941,6 +942,10 @@ export default function Admin() {
                   <input value={galleryDraft.caption} onChange={(event) => setGalleryDraft({ ...galleryDraft, caption: event.target.value })} />
                 </label>
                 <label>
+                  Date
+                  <input type="date" value={galleryDraft.date} onChange={(event) => setGalleryDraft({ ...galleryDraft, date: event.target.value })} />
+                </label>
+                <label>
                   Image URL
                   <input value={galleryDraft.src} onChange={(event) => setGalleryDraft({ ...galleryDraft, src: event.target.value })} placeholder="Enter URL or upload a file below" />
                 </label>
@@ -1181,9 +1186,11 @@ export default function Admin() {
                   </p>
                 </div>
                 <div className="admin-list__actions">
+                  <span className="admin-list__meta">{item.date || ""}</span>
                   <button className="admin-delete" type="button" onClick={() => {
-                    setGalleryDraft({ caption: item.caption, src: item.src });
+                    setGalleryDraft({ caption: item.caption, src: item.src, date: item.date || "" });
                     setEditingGalleryId(item.id);
+                    window.scrollTo({ top: 0, behavior: "smooth" });
                   }}>Edit</button>
                   <button className="admin-delete" type="button" onClick={() => deleteGalleryImage(item.id)}>Delete</button>
                 </div>
