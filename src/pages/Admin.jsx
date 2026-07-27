@@ -245,6 +245,7 @@ export default function Admin() {
     const galleryItem = {
       id: editingGalleryId || `p-${Date.now()}`,
       src: normalizedSrc,
+      imageupload: normalizedSrc,
       caption: galleryDraft.caption,
     };
     setData((current) => {
@@ -252,7 +253,7 @@ export default function Admin() {
         return {
           ...current,
           gallery: (current.gallery || []).map((item) => (item.id === editingGalleryId
-            ? { ...item, src: normalizedSrc, caption: galleryDraft.caption }
+            ? { ...item, src: normalizedSrc, imageupload: normalizedSrc, caption: galleryDraft.caption }
             : item)),
         };
       }
@@ -284,7 +285,14 @@ export default function Admin() {
 
   const saveEvent = async (event) => {
     event.preventDefault();
-    if (!eventDraft.title || !eventDraft.description) return;
+    if (!eventDraft.title || !eventDraft.description) {
+      alert("Please fill in the Title and Description fields.");
+      return;
+    }
+    if (!eventDraft.dateTime) {
+      alert("Please select a Date & Time for this event.");
+      return;
+    }
     const newEvent = {
       id: editingEventId || `${eventDraft.category}-${Date.now()}`,
       title: eventDraft.title,

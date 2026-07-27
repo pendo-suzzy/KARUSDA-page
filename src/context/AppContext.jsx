@@ -58,6 +58,9 @@ const normalizeItemForTable = ({ table_name, item }) => {
 
   if (table_name === "events" || table_name === "ministries") {
     if (normalizedItem.dateTime !== undefined) {
+      if (!normalizedItem.dateTime) {
+        throw new Error(`"Date & Time" is required and cannot be empty for ${table_name}. Please select a date and time.`);
+      }
       normalizedItem["date/time"] = normalizedItem.dateTime;
       delete normalizedItem.dateTime;
     }
