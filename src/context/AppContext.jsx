@@ -56,6 +56,15 @@ const normalizeItemForTable = ({ table_name, item }) => {
     normalizedItem.imageupload = normalizedItem.src;
   }
 
+  if (table_name === "events") {
+    if (normalizedItem.dateTime !== undefined) {
+      normalizedItem["date/time"] = normalizedItem.dateTime;
+      delete normalizedItem.dateTime;
+    }
+    delete normalizedItem.date;
+    delete normalizedItem.time;
+  }
+
   return normalizedItem;
 };
 
@@ -112,6 +121,7 @@ const mapRowFromDb = (row) => ({
   imageUrl: row.imageurl || row.imageupload || row.imageUrl || "",
   src: row.imageurl || row.imageupload || row.src || "",
   youtubeUrl: row.youtubeurl || row.youtubeUrl || "",
+  dateTime: row["date/time"] || row.dateTime || (row.date && row.time ? `${row.date}T${row.time}` : ""),
 });
 
 const buildDataFromRows = ({ announcements, events, gallery, leadership, ministries, choir, missions, sermon }) => {

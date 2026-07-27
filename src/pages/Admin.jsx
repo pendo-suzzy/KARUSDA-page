@@ -10,7 +10,7 @@ export default function Admin() {
   const [announcementDraft, setAnnouncementDraft] = useState({ title: "", body: "", date: "", imageUrl: "", documentUrl: "" });
   const [missionDraft, setMissionDraft] = useState({ title: "", year: "", summary: "", goalKes: "", raisedKes: "", documentUrl: "" });
   const [galleryDraft, setGalleryDraft] = useState({ caption: "", src: "" });
-  const [eventDraft, setEventDraft] = useState({ title: "", date: "", time: "", location: "", description: "", category: "services", imageUrl: "", documentUrl: "" });
+  const [eventDraft, setEventDraft] = useState({ title: "", dateTime: "", location: "", description: "", category: "services", imageUrl: "", documentUrl: "" });
   const [ministryDraft, setMinistryDraft] = useState({ name: "", tagline: "", description: "", meetingDay: "", meetingTime: "", documentUrl: "" });
   const [leadershipDraft, setLeadershipDraft] = useState({ name: "", role: "", bio: "", photo: "" });
   const [sermonDraft, setSermonDraft] = useState({ title: "", speaker: "", date: "", scripture: "", description: "", youtubeUrl: "", documentUrl: "" });
@@ -293,8 +293,7 @@ export default function Admin() {
     const newEvent = {
       id: editingEventId || `${eventDraft.category}-${Date.now()}`,
       title: eventDraft.title,
-      date: eventDraft.date,
-      time: eventDraft.time,
+      dateTime: eventDraft.dateTime,
       location: eventDraft.location,
       description: eventDraft.description,
       imageUrl: eventDraft.imageUrl || "",
@@ -342,7 +341,7 @@ export default function Admin() {
     if (!editingEventId) {
       await persistItem({ table: "events", item: newEvent });
     }
-    setEventDraft({ title: "", date: "", time: "", location: "", description: "", category: eventDraft.category, imageUrl: "", documentUrl: "" });
+    setEventDraft({ title: "", dateTime: "", location: "", description: "", category: eventDraft.category, imageUrl: "", documentUrl: "" });
     setEditingEventId(null);
   };
 
@@ -356,7 +355,7 @@ export default function Admin() {
     }));
     removePersistedItem({ table: "events", id: itemId });
     if (editingEventId === itemId) {
-      setEventDraft({ title: "", date: "", time: "", location: "", description: "", category: "services", imageUrl: "", documentUrl: "" });
+      setEventDraft({ title: "", dateTime: "", location: "", description: "", category: "services", imageUrl: "", documentUrl: "" });
       setEditingEventId(null);
     }
   };
@@ -759,12 +758,8 @@ export default function Admin() {
                   <input value={eventDraft.title} onChange={(event) => setEventDraft({ ...eventDraft, title: event.target.value })} />
                 </label>
                 <label>
-                  Date
-                  <input type="date" value={eventDraft.date} onChange={(event) => setEventDraft({ ...eventDraft, date: event.target.value })} />
-                </label>
-                <label>
-                  Time
-                  <input type="time" value={eventDraft.time} onChange={(event) => setEventDraft({ ...eventDraft, time: event.target.value })} />
+                  Date & Time
+                  <input type="datetime-local" value={eventDraft.dateTime} onChange={(event) => setEventDraft({ ...eventDraft, dateTime: event.target.value })} />
                 </label>
                 <label>
                   Location
@@ -1035,8 +1030,9 @@ export default function Admin() {
                 <div className="admin-list__actions">
                   <span className="admin-list__meta">{item.date}</span>
                   <button className="admin-delete" type="button" onClick={() => {
-                    setEventDraft({ title: item.title, date: item.date || "", time: item.time || "", location: item.location || "", description: item.description || "", category: item.category || "services", imageUrl: item.imageUrl || "" });
                     setEditingEventId(item.id);
+                    setEventDraft({ title: item.title, dateTime: item.dateTime || "", location: item.location || "", description: item.description || "", category: item.category || "services", imageUrl: item.imageUrl || "" });
+                    window.scrollTo({ top: 0, behavior: "smooth" });
                   }}>Edit</button>
                   <button className="admin-delete" type="button" onClick={() => deleteEvent(item.id)}>Delete</button>
                 </div>

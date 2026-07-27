@@ -3,6 +3,20 @@ import { useApp } from "../context/AppContext";
 import { normalizeUrl, getThumbnail } from "../lib/urlHelpers";
 import "./Events.css";
 
+function formatDateTime(dateTimeStr) {
+  if (!dateTimeStr) return { date: "", time: "" };
+  try {
+    const d = new Date(dateTimeStr);
+    if (isNaN(d.getTime())) return { date: dateTimeStr, time: "" };
+    return {
+      date: d.toLocaleDateString("en-US", { day: "numeric", month: "short", year: "numeric" }),
+      time: d.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" }),
+    };
+  } catch {
+    return { date: dateTimeStr, time: "" };
+  }
+}
+
 export default function Events() {
   const { data } = useApp();
   const { events = {}, gallery = [] } = data;
@@ -29,8 +43,8 @@ export default function Events() {
             {services.map((service) => (
               <article key={service.id} className="event-card event-card--gold">
                 <div className="event-card__when">
-                  <span className="event-card__date">{service.date}</span>
-                  <span className="event-card__time">{service.time}</span>
+                  <span className="event-card__date">{formatDateTime(service.dateTime).date}</span>
+                  <span className="event-card__time">{formatDateTime(service.dateTime).time}</span>
                 </div>
                 {service.imageUrl && (
                   <div className="event-card__image-wrap">
@@ -60,8 +74,8 @@ export default function Events() {
             {gatherings.map((gathering) => (
               <article key={gathering.id} className="event-card">
                 <div className="event-card__when">
-                  <span className="event-card__date">{gathering.date}</span>
-                  <span className="event-card__time">{gathering.time}</span>
+                  <span className="event-card__date">{formatDateTime(gathering.dateTime).date}</span>
+                  <span className="event-card__time">{formatDateTime(gathering.dateTime).time}</span>
                 </div>
                 {gathering.imageUrl && (
                   <div className="event-card__image-wrap">
@@ -86,7 +100,7 @@ export default function Events() {
             <div className="friday-vespers">
               <p className="eyebrow">Friday night</p>
               <h3 className="friday-vespers__title">{fridayVespers.title}</h3>
-              <p className="friday-vespers__time">{fridayVespers.time}</p>
+              <p className="friday-vespers__time">{formatDateTime(fridayVespers.dateTime).time}</p>
               <p className="friday-vespers__desc">
                 Welcome the Sabbath in prayer, song, and quiet reflection before the weekend begins. Our weekly service line continues with Sabbath School, divine service, and fellowship throughout the day.
               </p>
@@ -102,8 +116,8 @@ export default function Events() {
             {volunteer.map((item) => (
               <article key={item.id} className="event-card event-card--highland">
                 <div className="event-card__when">
-                  <span className="event-card__date">{item.date}</span>
-                  <span className="event-card__time">{item.time}</span>
+                  <span className="event-card__date">{formatDateTime(item.dateTime).date}</span>
+                  <span className="event-card__time">{formatDateTime(item.dateTime).time}</span>
                 </div>
                 <div className="event-card__body">
                   <h3>{item.title}</h3>
