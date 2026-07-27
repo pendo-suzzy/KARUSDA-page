@@ -176,9 +176,18 @@ export function isGooglePhotoUrl(url) {
  */
 export function normalizeUrl(url) {
   if (!url || typeof url !== "string") return url;
-  if (isYoutubeUrl(url)) return toYoutubeWatchUrl(url);
-  if (isGooglePhotoUrl(url)) return toGooglePhotoUrl(url);
-  return url;
+  
+  let processedUrl = url.trim();
+  // Ensure it has a protocol so it doesn't resolve as a relative path,
+  // unless it's intentionally a relative/absolute local path starting with '/'
+  if (!/^https?:\/\//i.test(processedUrl) && !processedUrl.startsWith("/")) {
+    processedUrl = `https://${processedUrl}`;
+  }
+
+  if (isYoutubeUrl(processedUrl)) return toYoutubeWatchUrl(processedUrl);
+  if (isGooglePhotoUrl(processedUrl)) return toGooglePhotoUrl(processedUrl);
+  
+  return processedUrl;
 }
 
 /**
