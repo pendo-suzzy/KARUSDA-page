@@ -56,6 +56,9 @@ const normalizeItemForTable = ({ table_name, item }) => {
     if (!normalizedItem.imageupload) {
       normalizedItem.imageupload = normalizedItem.src;
     }
+    if (!normalizedItem.imageurl) {
+      normalizedItem.imageurl = normalizedItem.src;
+    }
     delete normalizedItem.src;
   }
 

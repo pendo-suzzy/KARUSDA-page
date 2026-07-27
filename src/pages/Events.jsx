@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useApp } from "../context/AppContext";
-import { normalizeUrl, getThumbnail } from "../lib/urlHelpers";
+import { normalizeUrl, getThumbnail, isGooglePhotoUrl } from "../lib/urlHelpers";
 import "./Events.css";
 
 function formatDateTime(dateTimeStr) {
@@ -166,7 +166,17 @@ export default function Events() {
                       />
                     ) : (
                       <div className="wa-link-card__thumb-placeholder">
-                        <span>{image.caption || "Image preview"}</span>
+                        {isGooglePhotoUrl(rawUrl) ? (
+                          <div className="wa-link-card__placeholder-content">
+                            <span className="wa-link-card__placeholder-icon">📸</span>
+                            <span className="wa-link-card__placeholder-text">Google Photos Album</span>
+                          </div>
+                        ) : (
+                          <div className="wa-link-card__placeholder-content">
+                            <span className="wa-link-card__placeholder-icon">🔗</span>
+                            <span className="wa-link-card__placeholder-text">External Link</span>
+                          </div>
+                        )}
                       </div>
                     )}
                   </div>
