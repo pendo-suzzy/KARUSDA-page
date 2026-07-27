@@ -110,7 +110,7 @@ const mapRowFromDb = (row) => ({
   ...row,
   documentUrl: row.documenturl || row.documentUrl || "",
   imageUrl: row.imageurl || row.imageupload || row.imageUrl || "",
-  src: row.imageupload || row.src || "",
+  src: row.imageurl || row.imageupload || row.src || "",
   youtubeUrl: row.youtubeurl || row.youtubeUrl || "",
 });
 

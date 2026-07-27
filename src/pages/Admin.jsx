@@ -23,6 +23,7 @@ export default function Admin() {
   const [editingSermonId, setEditingSermonId] = useState(null);
   const [editingGalleryId, setEditingGalleryId] = useState(null);
   const [isUploading, setIsUploading] = useState(false);
+  const [saveError, setSaveError] = useState(null);
 
   const handleFileUpload = async (event, bucketName, callback) => {
     const file = event.target.files[0];
@@ -101,18 +102,25 @@ export default function Admin() {
 
   const persistItem = async ({ table, item }) => {
     try {
+      setSaveError(null);
       await syncItem({ table_name: table, item });
     } catch (err) {
       console.error(`Failed to persist ${table}:`, err);
-      alert(`Database save failed: ${err.message}. If you recently added new fields like Document Upload, make sure to add the 'documentUrl' column to your Supabase tables!`);
+      const errorMsg = `Database save failed for ${table}: ${err.message || JSON.stringify(err)}`;
+      setSaveError(errorMsg);
+      alert(errorMsg);
     }
   };
 
   const removePersistedItem = async ({ table, id }) => {
     try {
+      setSaveError(null);
       await removeItem({ table_name: table, id });
     } catch (err) {
-      console.error(`Failed to delete persisted ${table} row:`, err);
+      console.error(`Failed to delete ${table}:`, err);
+      const errorMsg = `Database delete failed for ${table}: ${err.message || JSON.stringify(err)}`;
+      setSaveError(errorMsg);
+      alert(errorMsg);
     }
   };
 
@@ -619,7 +627,12 @@ export default function Admin() {
 
   return (
     <div className="section">
-      <div className="container">
+      <div className="container admin-container">
+        {saveError && (
+          <div style={{ backgroundColor: "#ff4444", color: "white", padding: "1rem", borderRadius: "8px", marginBottom: "2rem", fontWeight: "bold" }}>
+            {saveError}
+          </div>
+        )}
         <div className="admin-panel__header" style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
           <div>
             <p className="eyebrow">Administration</p>
