@@ -8,7 +8,7 @@ export default function Admin() {
   const { data, setData, syncItem, removeItem, getUniqueId } = useApp();
   const [activeTab, setActiveTab] = useState("announcements");
   const [announcementDraft, setAnnouncementDraft] = useState({ title: "", body: "", date: "", imageUrl: "", documentUrl: "" });
-  const [missionDraft, setMissionDraft] = useState({ title: "", year: "", summary: "", goalKes: "", raisedKes: "", documentUrl: "" });
+  const [missionDraft, setMissionDraft] = useState({ title: "", year: "", summary: "", goalKes: "", raisedKes: "", documentUrl: "", missionType: "upcoming" });
   const [galleryDraft, setGalleryDraft] = useState({ caption: "", src: "" });
   const [eventDraft, setEventDraft] = useState({ title: "", dateTime: "", location: "", description: "", category: "services", imageUrl: "", documentUrl: "" });
   const [ministryDraft, setMinistryDraft] = useState({ name: "", tagline: "", description: "", dateTime: "", documentUrl: "" });
@@ -181,50 +181,44 @@ export default function Admin() {
   const saveMission = async (event) => {
     event.preventDefault();
     if (!missionDraft.title || !missionDraft.summary) return;
+    const isPast = missionDraft.missionType === "past";
     const mission = {
-      id: editingMissionId || `mu-${Date.now()}`,
+      id: editingMissionId || `m${isPast ? "p" : "u"}-${Date.now()}`,
       title: missionDraft.title,
       year: missionDraft.year || new Date().getFullYear().toString(),
       summary: missionDraft.summary,
-      goalKes: Number(missionDraft.goalKes || 0),
-      raisedKes: Number(missionDraft.raisedKes || 0),
-      upcoming: true,
+      goalKes: isPast ? undefined : Number(missionDraft.goalKes || 0),
+      raisedKes: isPast ? undefined : Number(missionDraft.raisedKes || 0),
+      upcoming: !isPast,
       documentUrl: missionDraft.documentUrl || "",
     };
     setData((current) => {
       if (editingMissionId) {
+        const isCurrentPast = (current.missions?.past || []).some((item) => item.id === editingMissionId);
         return {
           ...current,
           missions: {
             ...current.missions,
-            upcoming: (current.missions?.upcoming || []).map((item) => (item.id === editingMissionId
-              ? {
-                ...item,
-                title: missionDraft.title,
-                year: missionDraft.year || item.year,
-                summary: missionDraft.summary,
-                goalKes: Number(missionDraft.goalKes || item.goalKes || 0),
-                raisedKes: Number(missionDraft.raisedKes || item.raisedKes || 0),
-                documentUrl: missionDraft.documentUrl || "",
-              }
-              : item)),
+            upcoming: isCurrentPast
+              ? current.missions?.upcoming || []
+              : (current.missions?.upcoming || []).map((item) => item.id === editingMissionId ? { ...item, ...mission } : item),
+            past: isCurrentPast
+              ? (current.missions?.past || []).map((item) => item.id === editingMissionId ? { ...item, ...mission } : item)
+              : current.missions?.past || [],
           },
         };
       }
-
       return {
         ...current,
         missions: {
           ...current.missions,
-          upcoming: [
-            mission,
-            ...(current.missions?.upcoming || []),
-          ],
+          upcoming: isPast ? (current.missions?.upcoming || []) : [mission, ...(current.missions?.upcoming || [])],
+          past: isPast ? [mission, ...(current.missions?.past || [])] : (current.missions?.past || []),
         },
       };
     });
     await persistItem({ table: "missions", item: mission });
-    setMissionDraft({ title: "", year: "", summary: "", goalKes: "", raisedKes: "", documentUrl: "" });
+    setMissionDraft({ title: "", year: "", summary: "", goalKes: "", raisedKes: "", documentUrl: "", missionType: missionDraft.missionType });
     setEditingMissionId(null);
   };
 
@@ -234,11 +228,12 @@ export default function Admin() {
       missions: {
         ...current.missions,
         upcoming: (current.missions?.upcoming || []).filter((item) => item.id !== itemId),
+        past: (current.missions?.past || []).filter((item) => item.id !== itemId),
       },
     }));
     removePersistedItem({ table: "missions", id: itemId });
     if (editingMissionId === itemId) {
-      setMissionDraft({ title: "", year: "", summary: "", goalKes: "", raisedKes: "", documentUrl: "" });
+      setMissionDraft({ title: "", year: "", summary: "", goalKes: "", raisedKes: "", documentUrl: "", missionType: "upcoming" });
       setEditingMissionId(null);
     }
   };
@@ -710,7 +705,14 @@ export default function Admin() {
 
             {activeTab === "missions" && (
               <>
-                <h3>Add mission project</h3>
+                <h3>{editingMissionId ? "Edit mission" : "Add mission project"}</h3>
+                <label>
+                  Type
+                  <select value={missionDraft.missionType} onChange={(event) => setMissionDraft({ ...missionDraft, missionType: event.target.value })}>
+                    <option value="upcoming">Upcoming Initiative</option>
+                    <option value="past">Timeline (Past Mission)</option>
+                  </select>
+                </label>
                 <label>
                   Title
                   <input value={missionDraft.title} onChange={(event) => setMissionDraft({ ...missionDraft, title: event.target.value })} />
@@ -723,16 +725,18 @@ export default function Admin() {
                   Summary
                   <textarea rows="4" value={missionDraft.summary} onChange={(event) => setMissionDraft({ ...missionDraft, summary: event.target.value })} />
                 </label>
-                <div className="admin-form__row">
-                  <label>
-                    Goal (KES)
-                    <input type="number" value={missionDraft.goalKes} onChange={(event) => setMissionDraft({ ...missionDraft, goalKes: event.target.value })} />
-                  </label>
-                  <label>
-                    Raised (KES)
-                    <input type="number" value={missionDraft.raisedKes} onChange={(event) => setMissionDraft({ ...missionDraft, raisedKes: event.target.value })} />
-                  </label>
-                </div>
+                {missionDraft.missionType === "upcoming" && (
+                  <div className="admin-form__row">
+                    <label>
+                      Goal (KES)
+                      <input type="number" value={missionDraft.goalKes} onChange={(event) => setMissionDraft({ ...missionDraft, goalKes: event.target.value })} />
+                    </label>
+                    <label>
+                      Raised (KES)
+                      <input type="number" value={missionDraft.raisedKes} onChange={(event) => setMissionDraft({ ...missionDraft, raisedKes: event.target.value })} />
+                    </label>
+                  </div>
+                )}
                 <label>
                   Upload Document
                   <input type="file" accept=".pdf,.doc,.docx,.txt" onChange={(e) => handleFileUpload(e, "missions", (url) => setMissionDraft({ ...missionDraft, documentUrl: url }))} />
@@ -997,22 +1001,46 @@ export default function Admin() {
               </div>
             ))}
 
-            {activeTab === "missions" && (data.missions?.upcoming || []).map((item) => (
-              <div key={item.id} className="admin-list__row">
-                <div>
-                  <strong>{item.title}</strong>
-                  <p>{item.summary}</p>
-                </div>
-                <div className="admin-list__actions">
-                  <span className="admin-list__meta">{item.year}</span>
-                  <button className="admin-delete" type="button" onClick={() => {
-                    setMissionDraft({ title: item.title, year: item.year || "", summary: item.summary, goalKes: item.goalKes || "", raisedKes: item.raisedKes || "" });
-                    setEditingMissionId(item.id);
-                  }}>Edit</button>
-                  <button className="admin-delete" type="button" onClick={() => deleteMission(item.id)}>Delete</button>
-                </div>
-              </div>
-            ))}
+            {activeTab === "missions" && (
+              <>
+                <p style={{ fontWeight: "bold", marginBottom: "0.5rem" }}>Upcoming Initiatives</p>
+                {(data.missions?.upcoming || []).map((item) => (
+                  <div key={item.id} className="admin-list__row">
+                    <div>
+                      <strong>{item.title}</strong>
+                      <p>{item.summary}</p>
+                    </div>
+                    <div className="admin-list__actions">
+                      <span className="admin-list__meta">{item.year}</span>
+                      <button className="admin-delete" type="button" onClick={() => {
+                        setMissionDraft({ title: item.title, year: item.year || "", summary: item.summary || "", goalKes: item.goalKes || "", raisedKes: item.raisedKes || "", documentUrl: item.documentUrl || "", missionType: "upcoming" });
+                        setEditingMissionId(item.id);
+                        window.scrollTo({ top: 0, behavior: "smooth" });
+                      }}>Edit</button>
+                      <button className="admin-delete" type="button" onClick={() => deleteMission(item.id)}>Delete</button>
+                    </div>
+                  </div>
+                ))}
+                <p style={{ fontWeight: "bold", margin: "1.5rem 0 0.5rem" }}>Mission Timeline (Past)</p>
+                {(data.missions?.past || []).map((item) => (
+                  <div key={item.id} className="admin-list__row">
+                    <div>
+                      <strong>{item.title}</strong>
+                      <p>{item.summary}</p>
+                    </div>
+                    <div className="admin-list__actions">
+                      <span className="admin-list__meta">{item.year}</span>
+                      <button className="admin-delete" type="button" onClick={() => {
+                        setMissionDraft({ title: item.title, year: item.year || "", summary: item.summary || "", goalKes: "", raisedKes: "", documentUrl: item.documentUrl || "", missionType: "past" });
+                        setEditingMissionId(item.id);
+                        window.scrollTo({ top: 0, behavior: "smooth" });
+                      }}>Edit</button>
+                      <button className="admin-delete" type="button" onClick={() => deleteMission(item.id)}>Delete</button>
+                    </div>
+                  </div>
+                ))}
+              </>
+            )}
 
             {activeTab === "events" && [...(data.events?.services || []), ...(data.events?.gatherings || []), ...(data.events?.volunteer || [])].map((item) => (
               <div key={item.id} className="admin-list__row">
