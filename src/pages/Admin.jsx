@@ -760,11 +760,11 @@ export default function Admin() {
                 </label>
                 <label>
                   Date
-                  <input value={eventDraft.date} onChange={(event) => setEventDraft({ ...eventDraft, date: event.target.value })} />
+                  <input type="date" value={eventDraft.date} onChange={(event) => setEventDraft({ ...eventDraft, date: event.target.value })} />
                 </label>
                 <label>
                   Time
-                  <input value={eventDraft.time} onChange={(event) => setEventDraft({ ...eventDraft, time: event.target.value })} />
+                  <input type="time" value={eventDraft.time} onChange={(event) => setEventDraft({ ...eventDraft, time: event.target.value })} />
                 </label>
                 <label>
                   Location
