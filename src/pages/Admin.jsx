@@ -11,7 +11,7 @@ export default function Admin() {
   const [missionDraft, setMissionDraft] = useState({ title: "", year: "", summary: "", goalKes: "", raisedKes: "", documentUrl: "" });
   const [galleryDraft, setGalleryDraft] = useState({ caption: "", src: "" });
   const [eventDraft, setEventDraft] = useState({ title: "", dateTime: "", location: "", description: "", category: "services", imageUrl: "", documentUrl: "" });
-  const [ministryDraft, setMinistryDraft] = useState({ name: "", tagline: "", description: "", meetingDay: "", meetingTime: "", documentUrl: "" });
+  const [ministryDraft, setMinistryDraft] = useState({ name: "", tagline: "", description: "", dateTime: "", documentUrl: "" });
   const [leadershipDraft, setLeadershipDraft] = useState({ name: "", role: "", bio: "", photo: "" });
   const [sermonDraft, setSermonDraft] = useState({ title: "", speaker: "", date: "", scripture: "", description: "", youtubeUrl: "", documentUrl: "" });
   const [choirVideoDraft, setChoirVideoDraft] = useState({ id: "", title: "", youtubeUrl: "", date: "", imageUrl: "" });
@@ -368,8 +368,7 @@ export default function Admin() {
       name: ministryDraft.name,
       tagline: ministryDraft.tagline,
       description: ministryDraft.description,
-      meetingDay: ministryDraft.meetingDay,
-      meetingTime: ministryDraft.meetingTime,
+      dateTime: ministryDraft.dateTime,
       documentUrl: ministryDraft.documentUrl || "",
     };
     setData((current) => {
@@ -393,7 +392,7 @@ export default function Admin() {
       };
     });
     await persistItem({ table: "ministries", item: ministry });
-    setMinistryDraft({ name: "", tagline: "", description: "", meetingDay: "", meetingTime: "", documentUrl: "" });
+    setMinistryDraft({ name: "", tagline: "", description: "", dateTime: "", documentUrl: "" });
     setEditingMinistryId(null);
   };
 
@@ -404,7 +403,7 @@ export default function Admin() {
     }));
     removePersistedItem({ table: "ministries", id: itemId });
     if (editingMinistryId === itemId) {
-      setMinistryDraft({ name: "", tagline: "", description: "", meetingDay: "", meetingTime: "", documentUrl: "" });
+      setMinistryDraft({ name: "", tagline: "", description: "", dateTime: "", documentUrl: "" });
       setEditingMinistryId(null);
     }
   };
@@ -800,16 +799,10 @@ export default function Admin() {
                   Description
                   <textarea rows="4" value={ministryDraft.description} onChange={(event) => setMinistryDraft({ ...ministryDraft, description: event.target.value })} />
                 </label>
-                <div className="admin-form__row">
-                  <label>
-                    Meeting day
-                    <input value={ministryDraft.meetingDay} onChange={(event) => setMinistryDraft({ ...ministryDraft, meetingDay: event.target.value })} />
-                  </label>
-                  <label>
-                    Meeting time
-                    <input value={ministryDraft.meetingTime} onChange={(event) => setMinistryDraft({ ...ministryDraft, meetingTime: event.target.value })} />
-                  </label>
-                </div>
+                <label>
+                  Date & Time
+                  <input type="datetime-local" value={ministryDraft.dateTime} onChange={(event) => setMinistryDraft({ ...ministryDraft, dateTime: event.target.value })} />
+                </label>
                 <label>
                   Upload Document
                   <input type="file" accept=".pdf,.doc,.docx,.txt" onChange={(e) => handleFileUpload(e, "ministries", (url) => setMinistryDraft({ ...ministryDraft, documentUrl: url }))} />
@@ -1046,9 +1039,9 @@ export default function Admin() {
                   <p>{item.description}</p>
                 </div>
                 <div className="admin-list__actions">
-                  <span className="admin-list__meta">{item.meetingDay}</span>
+                  <span className="admin-list__meta">{item.dateTime ? new Date(item.dateTime).toLocaleDateString() : ""}</span>
                   <button className="admin-delete" type="button" onClick={() => {
-                    setMinistryDraft({ name: item.name, tagline: item.tagline || "", description: item.description || "", meetingDay: item.meetingDay || "", meetingTime: item.meetingTime || "" });
+                    setMinistryDraft({ name: item.name, tagline: item.tagline || "", description: item.description || "", dateTime: item.dateTime || "", documentUrl: item.documentUrl || "" });
                     setEditingMinistryId(item.id);
                   }}>Edit</button>
                   <button className="admin-delete" type="button" onClick={() => deleteMinistry(item.id)}>Delete</button>

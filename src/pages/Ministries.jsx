@@ -2,6 +2,20 @@ import { useApp } from "../context/AppContext";
 import { getYoutubeThumbnail, normalizeUrl } from "../lib/urlHelpers";
 import "./Ministries.css";
 
+function formatDateTime(dateTimeStr) {
+  if (!dateTimeStr) return { date: "", time: "" };
+  try {
+    const d = new Date(dateTimeStr);
+    if (isNaN(d.getTime())) return { date: dateTimeStr, time: "" };
+    return {
+      date: d.toLocaleDateString("en-US", { day: "numeric", month: "short", year: "numeric" }),
+      time: d.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" }),
+    };
+  } catch {
+    return { date: dateTimeStr, time: "" };
+  }
+}
+
 const fellowshipGroups = [
   {
     title: "Youth and Young Adults",
@@ -41,7 +55,7 @@ export default function Ministries() {
                 <h3 className="ministry-card__name">{ministry.name}</h3>
                 <p className="ministry-card__tagline">{ministry.tagline}</p>
                 <p className="ministry-card__desc">{ministry.description}</p>
-                <p className="ministry-card__time">{ministry.meetingDay} · {ministry.meetingTime}</p>
+                <p className="ministry-card__time">{formatDateTime(ministry.dateTime).date} {formatDateTime(ministry.dateTime).time ? `· ${formatDateTime(ministry.dateTime).time}` : ""}</p>
                 {ministry.documentUrl && (
                   <a href={ministry.documentUrl} target="_blank" rel="noopener noreferrer" className="document-link">
                     📄 Read Document
