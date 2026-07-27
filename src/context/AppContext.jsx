@@ -52,8 +52,11 @@ const normalizeItemForTable = ({ table_name, item }) => {
     delete normalizedItem.imageUrl;
   }
 
-  if (table_name === "gallery" && normalizedItem.src !== undefined && !normalizedItem.imageupload) {
-    normalizedItem.imageupload = normalizedItem.src;
+  if (table_name === "gallery" && normalizedItem.src !== undefined) {
+    if (!normalizedItem.imageupload) {
+      normalizedItem.imageupload = normalizedItem.src;
+    }
+    delete normalizedItem.src;
   }
 
   if (table_name === "events" || table_name === "ministries") {
