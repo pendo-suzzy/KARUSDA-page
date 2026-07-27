@@ -17,11 +17,46 @@ function formatDateTime(dateTimeStr) {
   }
 }
 
+function EventCard({ item, accentClass = "" }) {
+  const { date, time } = formatDateTime(item.dateTime);
+  return (
+    <article className={`event-card ${accentClass}`}>
+      <div className="event-card__when">
+        <span className="event-card__date">{date}</span>
+        <span className="event-card__time">{time}</span>
+      </div>
+      {item.imageUrl && (
+        <div className="event-card__image-wrap">
+          <img src={item.imageUrl} alt={item.title} className="event-card__image" />
+        </div>
+      )}
+      <div className="event-card__body">
+        <h3>{item.title}</h3>
+        <p>{item.description}</p>
+        {item.location && <div className="event-card__location">📍 {item.location}</div>}
+        {item.documentUrl && (
+          <a href={item.documentUrl} target="_blank" rel="noopener noreferrer" className="document-link">
+            📄 Read Document
+          </a>
+        )}
+      </div>
+    </article>
+  );
+}
+
+function SectionBanner({ icon, label, color }) {
+  return (
+    <div className="events-section-banner" style={{ "--banner-color": color }}>
+      <span className="events-section-banner__icon">{icon}</span>
+      <span className="events-section-banner__label">{label}</span>
+    </div>
+  );
+}
+
 export default function Events() {
   const { data } = useApp();
   const { events = {}, gallery = [] } = data;
   const { services = [], gatherings = [], volunteer = [] } = events;
-  const fridayVespers = gatherings.find((item) => item.isSabbathEve) || gatherings[0];
   const [failedImages, setFailedImages] = useState({});
 
   return (
@@ -33,108 +68,73 @@ export default function Events() {
           <p className="page-hero__sub">
             Worship, fellowship, and service come together throughout the week at Karatina University SDA Church.
           </p>
-        </div>
-      </section>
-
-      <section className="section">
-        <div className="container">
-          <h2 className="section__title">Weekly services</h2>
-          <div className="event-list">
-            {services.map((service) => (
-              <article key={service.id} className="event-card event-card--gold">
-                <div className="event-card__when">
-                  <span className="event-card__date">{formatDateTime(service.dateTime).date}</span>
-                  <span className="event-card__time">{formatDateTime(service.dateTime).time}</span>
-                </div>
-                {service.imageUrl && (
-                  <div className="event-card__image-wrap">
-                    <img src={service.imageUrl} alt={service.title} className="event-card__image" />
-                  </div>
-                )}
-                <div className="event-card__body">
-                  <h3>{service.title}</h3>
-                  <p>{service.description}</p>
-                  <div className="event-card__location">{service.location}</div>
-                  {service.documentUrl && (
-                    <a href={service.documentUrl} target="_blank" rel="noopener noreferrer" className="document-link">
-                      📄 Read Document
-                    </a>
-                  )}
-                </div>
-              </article>
-            ))}
+          <div className="events-nav">
+            <a href="#services" className="events-nav__pill">⛪ Services</a>
+            <a href="#gatherings" className="events-nav__pill">🤝 Gatherings</a>
+            <a href="#volunteer" className="events-nav__pill">🙌 Volunteer</a>
+            <a href="#gallery" className="events-nav__pill">🖼️ Gallery</a>
           </div>
         </div>
       </section>
 
-      <section className="section">
+      {/* ── SERVICES ─────────────────────────────────── */}
+      <section id="services" className="section events-category-section events-category-section--services">
         <div className="container">
-          <h2 className="section__title">Midweek and fellowship</h2>
-          <div className="event-list">
-            {gatherings.map((gathering) => (
-              <article key={gathering.id} className="event-card">
-                <div className="event-card__when">
-                  <span className="event-card__date">{formatDateTime(gathering.dateTime).date}</span>
-                  <span className="event-card__time">{formatDateTime(gathering.dateTime).time}</span>
-                </div>
-                {gathering.imageUrl && (
-                  <div className="event-card__image-wrap">
-                    <img src={gathering.imageUrl} alt={gathering.title} className="event-card__image" />
-                  </div>
-                )}
-                <div className="event-card__body">
-                  <h3>{gathering.title}</h3>
-                  <p>{gathering.description}</p>
-                  <div className="event-card__location">{gathering.location}</div>
-                  {gathering.documentUrl && (
-                    <a href={gathering.documentUrl} target="_blank" rel="noopener noreferrer" className="document-link">
-                      📄 Read Document
-                    </a>
-                  )}
-                </div>
-              </article>
-            ))}
-          </div>
-
-          {fridayVespers && (
-            <div className="friday-vespers">
-              <p className="eyebrow">Friday night</p>
-              <h3 className="friday-vespers__title">{fridayVespers.title}</h3>
-              <p className="friday-vespers__time">{formatDateTime(fridayVespers.dateTime).time}</p>
-              <p className="friday-vespers__desc">
-                Welcome the Sabbath in prayer, song, and quiet reflection before the weekend begins. Our weekly service line continues with Sabbath School, divine service, and fellowship throughout the day.
-              </p>
+          <SectionBanner icon="⛪" label="Weekly Services" color="var(--gold)" />
+          <p className="events-category-desc">Join us every Sabbath for worship, Sabbath School, divine service, and fellowship.</p>
+          {services.length === 0 ? (
+            <div className="events-empty">
+              <span>No services scheduled yet. Check back soon!</span>
+            </div>
+          ) : (
+            <div className="event-list">
+              {services.map((service) => (
+                <EventCard key={service.id} item={service} accentClass="event-card--gold" />
+              ))}
             </div>
           )}
         </div>
       </section>
 
-      <section className="section">
+      {/* ── GATHERINGS ────────────────────────────────── */}
+      <section id="gatherings" className="section events-category-section events-category-section--gatherings">
         <div className="container">
-          <h2 className="section__title">Volunteer opportunities</h2>
-          <div className="event-list">
-            {volunteer.map((item) => (
-              <article key={item.id} className="event-card event-card--highland">
-                <div className="event-card__when">
-                  <span className="event-card__date">{formatDateTime(item.dateTime).date}</span>
-                  <span className="event-card__time">{formatDateTime(item.dateTime).time}</span>
-                </div>
-                <div className="event-card__body">
-                  <h3>{item.title}</h3>
-                  <p>{item.description}</p>
-                  <div className="event-card__location">{item.location}</div>
-                  {item.documentUrl && (
-                    <a href={item.documentUrl} target="_blank" rel="noopener noreferrer" className="document-link">
-                      📄 Read Document
-                    </a>
-                  )}
-                </div>
-              </article>
-            ))}
-          </div>
+          <SectionBanner icon="🤝" label="Midweek & Gatherings" color="var(--clay)" />
+          <p className="events-category-desc">Midweek prayer, Bible study, and special fellowship meetings throughout the week.</p>
+          {gatherings.length === 0 ? (
+            <div className="events-empty">
+              <span>No gatherings scheduled yet. Check back soon!</span>
+            </div>
+          ) : (
+            <div className="event-list">
+              {gatherings.map((gathering) => (
+                <EventCard key={gathering.id} item={gathering} accentClass="event-card--clay" />
+              ))}
+            </div>
+          )}
         </div>
       </section>
 
+      {/* ── VOLUNTEER ─────────────────────────────────── */}
+      <section id="volunteer" className="section events-category-section events-category-section--volunteer">
+        <div className="container">
+          <SectionBanner icon="🙌" label="Volunteer Opportunities" color="var(--highland)" />
+          <p className="events-category-desc">Serve the campus and community — from outreach to hospitality and beyond.</p>
+          {volunteer.length === 0 ? (
+            <div className="events-empty">
+              <span>No volunteer opportunities listed yet. Check back soon!</span>
+            </div>
+          ) : (
+            <div className="event-list">
+              {volunteer.map((item) => (
+                <EventCard key={item.id} item={item} accentClass="event-card--highland" />
+              ))}
+            </div>
+          )}
+        </div>
+      </section>
+
+      {/* ── GALLERY ───────────────────────────────────── */}
       <section id="gallery" className="section gallery">
         <div className="container">
           <div className="gallery__header">

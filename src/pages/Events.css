@@ -15,6 +15,87 @@
   max-width: 50ch;
 }
 
+/* ── Section nav pills ───────────────────────────── */
+.events-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: var(--space-3);
+}
+
+.events-nav__pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.4rem 1rem;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 252, 244, 0.25);
+  color: var(--paper);
+  font-size: 0.82rem;
+  font-family: var(--font-mono);
+  text-decoration: none;
+  transition: background 0.2s, border-color 0.2s;
+}
+
+.events-nav__pill:hover {
+  background: rgba(255, 252, 244, 0.12);
+  border-color: rgba(255, 252, 244, 0.5);
+}
+
+/* ── Category section backgrounds ───────────────── */
+.events-category-section--services  { background: #fffef7; }
+.events-category-section--gatherings { background: #f9f6f0; }
+.events-category-section--volunteer  { background: #f4f8f4; }
+
+/* ── Section banner header ───────────────────────── */
+.events-section-banner {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  margin-bottom: 0.5rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 3px solid var(--banner-color, var(--ink));
+}
+
+.events-section-banner__icon {
+  font-size: 1.6rem;
+  line-height: 1;
+}
+
+.events-section-banner__label {
+  font-family: var(--font-display);
+  font-size: clamp(1.4rem, 3vw, 1.9rem);
+  font-weight: 700;
+  color: var(--ink);
+}
+
+/* ── Category description ────────────────────────── */
+.events-category-desc {
+  color: var(--ink-soft);
+  margin: 0 0 var(--space-3);
+  max-width: 60ch;
+  font-size: 0.95rem;
+}
+
+/* ── Empty state ─────────────────────────────────── */
+.events-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-4);
+  border: 2px dashed var(--line);
+  border-radius: var(--radius);
+  color: var(--ink-soft);
+  font-family: var(--font-mono);
+  font-size: 0.88rem;
+  text-align: center;
+}
+
+/* ── Clay card accent ────────────────────────────── */
+.event-card--clay {
+  border-left-color: var(--clay);
+}
+
 .event-list {
   display: flex;
   flex-direction: column;
