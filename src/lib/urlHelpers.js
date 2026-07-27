@@ -132,25 +132,10 @@ export function toGooglePhotoUrl(url) {
     }
   }
 
-  const photoPatterns = [
-    /photos\.google\.com\/share\/[^/]+\/photo\/([a-zA-Z0-9_-]+)/,
-    /photos\.google\.com\/lh\/photo\/([a-zA-Z0-9_-]+)/,
-    /photos\.google\.com\/share\/([a-zA-Z0-9_-]+)/,
-    /photos\.app\.goo\.gl\/([a-zA-Z0-9_-]+)/,
-  ];
-
-  for (const pattern of photoPatterns) {
-    const match = trimmedUrl.match(pattern);
-    if (match?.[1]) {
-      const token = match[1];
-      return [
-        `https://lh3.googleusercontent.com/pw/${token}`,
-        `https://lh3.googleusercontent.com/${token}`,
-        `https://lh3.googleusercontent.com/pw/${token}=w800`,
-        `https://lh3.googleusercontent.com/${token}=w800`,
-      ][0];
-    }
-  }
+  // Note: Google Photos share links (photos.app.goo.gl, photos.google.com/share)
+  // do not expose direct image URLs. We must leave them as-is so they open
+  // correctly in Google Photos when clicked. Trying to force them into
+  // lh3.googleusercontent.com/pw/... is broken.
 
   if (/photos\.google\.com\/album\//.test(trimmedUrl)) {
     return trimmedUrl;
@@ -206,7 +191,14 @@ export function normalizeUrl(url) {
 export function getThumbnail(url) {
   if (!url) return null;
   if (isYoutubeUrl(url)) return getYoutubeThumbnail(url);
-  if (isGooglePhotoUrl(url)) return toGooglePhotoUrl(url);
+  if (isGooglePhotoUrl(url)) {
+    // Google Photos share links are HTML pages, not images. 
+    // Return null so we don't try to render them in an <img> tag.
+    if (url.includes("photos.app.goo.gl") || url.includes("photos.google.com")) {
+      return null;
+    }
+    return toGooglePhotoUrl(url);
+  }
   // If it looks like a direct image URL, return it
   if (/\.(jpe?g|png|gif|webp|svg|avif)(\?.*)?$/i.test(url)) return url;
   if (url.startsWith("https://picsum.photos")) return url;
