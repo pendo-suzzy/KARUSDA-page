@@ -68,7 +68,44 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="section">
+      {/* Mission, Vision, Aim Section */}
+      <section className="mva-section">
+        <div className="container">
+          <div className="mva-grid">
+            <div className="mva-card">
+              <div className="mva-card__icon-wrap">
+                <span className="mva-card__icon">🎯</span>
+              </div>
+              <h3 className="mva-card__title">Our Mission</h3>
+              <p className="mva-card__text">
+                To proclaim the everlasting gospel of Jesus Christ, calling all people to become His disciples and preparing them for His soon return.
+              </p>
+            </div>
+            
+            <div className="mva-card mva-card--accent">
+              <div className="mva-card__icon-wrap">
+                <span className="mva-card__icon">👁️</span>
+              </div>
+              <h3 className="mva-card__title">Our Vision</h3>
+              <p className="mva-card__text">
+                A vibrant, spirit-filled community deeply rooted in Scripture, sharing hope, healing, and love in a broken world.
+              </p>
+            </div>
+            
+            <div className="mva-card">
+              <div className="mva-card__icon-wrap">
+                <span className="mva-card__icon">🕊️</span>
+              </div>
+              <h3 className="mva-card__title">Our Aim</h3>
+              <p className="mva-card__text">
+                To foster a nurturing environment where every member is equipped, encouraged, and empowered for impactful service.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="section stats-section">
         <div className="container">
           <div className="stats__grid">
             <div className="stat">

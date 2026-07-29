@@ -145,6 +145,97 @@
   gap: var(--space-3);
 }
 
+/* === Mission, Vision, Aim Section === */
+.mva-section {
+  padding: var(--space-6) 0;
+  background: var(--paper);
+  position: relative;
+  z-index: 1;
+}
+
+.mva-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-4);
+}
+
+.mva-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: var(--space-4) var(--space-3);
+  background: #fffef7;
+  border: 1px solid rgba(0,0,0,0.05);
+  border-radius: 20px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.03);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.mva-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: var(--clay);
+  opacity: 0.8;
+}
+
+.mva-card--accent::before {
+  background: var(--gold);
+}
+
+.mva-card:last-child::before {
+  background: var(--highland);
+}
+
+.mva-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 20px 40px rgba(0,0,0,0.06);
+}
+
+.mva-card__icon-wrap {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: rgba(201, 150, 46, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: var(--space-3);
+}
+
+.mva-card--accent .mva-card__icon-wrap {
+  background: rgba(194, 160, 86, 0.15);
+}
+
+.mva-card:last-child .mva-card__icon-wrap {
+  background: rgba(107, 143, 113, 0.15);
+}
+
+.mva-card__icon {
+  font-size: 1.8rem;
+}
+
+.mva-card__title {
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--ink);
+  margin: 0 0 1rem;
+}
+
+.mva-card__text {
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: var(--ink-soft);
+  max-width: 32ch;
+}
+
 /* === Weekly Schedule === */
 .week-schedule {
   background: linear-gradient(135deg, #1a1510 0%, #2a1f12 45%, #1c1810 100%);
@@ -355,6 +446,7 @@
     grid-template-columns: repeat(2, 1fr);
     gap: var(--space-3) var(--space-2);
   }
+  .mva-grid,
   .announcements__grid,
   .quicklinks__grid {
     grid-template-columns: 1fr;
