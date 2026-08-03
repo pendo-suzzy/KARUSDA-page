@@ -79,36 +79,6 @@ const normalizeItemForTable = ({ table_name, item }) => {
   return normalizedItem;
 };
 
-const buildItemPayload = (item, table) => {
-  const common = { ...item };
-
-  if (table === "events") {
-    return {
-      id: item.id,
-      category: item.category || "services",
-      title: item.title,
-      date: item.date,
-      time: item.time,
-      location: item.location,
-      description: item.description,
-      isSabbathEve: item.isSabbathEve || false,
-    };
-  }
-
-  if (table === "missions") {
-    return {
-      id: item.id,
-      title: item.title,
-      year: item.year,
-      summary: item.summary,
-      goalKes: item.goalKes || 0,
-      raisedKes: item.raisedKes || 0,
-    };
-  }
-
-  return common;
-};
-
 const TABLE_NAMES = [
   "announcements",
   "events",

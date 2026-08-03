@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { supabase } from "../lib/supabaseClient";
 import "./Give.css";
 
 export default function Give() {
@@ -9,7 +10,7 @@ export default function Give() {
   const [status, setStatus] = useState("idle"); // idle, processing, success, error
   const [errorMsg, setErrorMsg] = useState("");
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!amount || Number(amount) < 10) {
       setErrorMsg("Please enter a valid amount (minimum 10 KES).");
@@ -25,6 +26,22 @@ export default function Give() {
 
     setErrorMsg("");
     setStatus("processing");
+
+    // Log the giving attempt to Supabase
+    try {
+      await supabase.from("giving_logs").insert([
+        {
+          phone: phone,
+          amount: Number(amount),
+          purpose: purpose,
+          status: "initiated"
+        }
+      ]);
+    } catch (err) {
+      console.error("Failed to log giving attempt:", err);
+      // We deliberately don't set errorMsg here because we don't want a logging 
+      // failure to stop the user from believing the STK push was sent.
+    }
 
     // Simulate STK Push delay
     setTimeout(() => {
