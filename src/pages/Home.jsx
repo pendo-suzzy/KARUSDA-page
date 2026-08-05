@@ -30,9 +30,6 @@ export default function Home() {
             and mission in one joyful community.
           </p>
           <div className="hero__actions">
-            <Link to="/events" className="button button--primary">
-              View upcoming events
-            </Link>
             <a
               href="https://www.youtube.com/channel/UCmFWvxiBFvwYkJbsQ8zdMXg"
               target="_blank"
@@ -202,16 +199,6 @@ export default function Home() {
                 <span className="quicklink__title">Missions</span>
                 <span className="quicklink__desc">See how our church reaches out in the community and beyond Kenya's borders.</span>
                 <span className="quicklink__arrow">Learn more →</span>
-              </div>
-            </Link>
-            <Link to="/events" className="quicklink quicklink--events">
-              <div className="quicklink__icon">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-              </div>
-              <div className="quicklink__body">
-                <span className="quicklink__title">Events</span>
-                <span className="quicklink__desc">Find Sabbath worship services, vespers, and fellowship opportunities.</span>
-                <span className="quicklink__arrow">Join us →</span>
               </div>
             </Link>
           </div>
