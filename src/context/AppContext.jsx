@@ -15,6 +15,7 @@ const DEFAULT_DATA = {
   missions: { past: [], upcoming: [] },
   stats: { yearsActive: 0, members: 0, ministries: 0, choirVoices: 0 },
   contact: { address: "", email: "", facebook: "", instagram: "", youtube: "" },
+  lessonStudy: { quarterPdfUrl: "", notes: [] },
 };
 
 const normalizeItemForTable = ({ table_name, item }) => {
@@ -88,6 +89,7 @@ const TABLE_NAMES = [
   "choir",
   "missions",
   "sermon",
+  "lessonstudy",
 ];
 
 const normalizeTableName = (tableName) => {
@@ -105,7 +107,7 @@ const mapRowFromDb = (row) => ({
   dateTime: row["date/time"] || row.dateTime || (row.date && row.time ? `${row.date}T${row.time}` : "") || (row.meetingDay && row.meetingTime ? `${row.meetingDay} ${row.meetingTime}` : ""),
 });
 
-const buildDataFromRows = ({ announcements, events, gallery, leadership, ministries, choir, missions, sermon }) => {
+const buildDataFromRows = ({ announcements, events, gallery, leadership, ministries, choir, missions, sermon, lessonstudy: lesson }) => {
   const data = { ...DEFAULT_DATA };
 
   data.announcements = (announcements || []).map(mapRowFromDb);
@@ -141,6 +143,18 @@ const buildDataFromRows = ({ announcements, events, gallery, leadership, ministr
       data.missions.upcoming.push(mission);
     }
   });
+
+  // lesson study: quarter PDF + weekly notes
+  if (lesson) {
+    const lessonRows = lesson || [];
+    const quarterRow = lessonRows.find((r) => (r.type || r.kind) === "quarter");
+    data.lessonStudy = {
+      quarterPdfUrl: quarterRow?.documentUrl || quarterRow?.documenturl || "",
+      notes: lessonRows.filter((r) => (r.type || r.kind) !== "quarter").map(mapRowFromDb),
+    };
+  } else {
+    data.lessonStudy = { quarterPdfUrl: "", notes: [] };
+  }
 
   return data;
 };

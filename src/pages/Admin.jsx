@@ -15,7 +15,9 @@ export default function Admin() {
   const [leadershipDraft, setLeadershipDraft] = useState({ name: "", role: "", bio: "", photo: "" });
   const [sermonDraft, setSermonDraft] = useState({ title: "", speaker: "", date: "", scripture: "", description: "", youtubeUrl: "", documentUrl: "" });
   const [choirVideoDraft, setChoirVideoDraft] = useState({ id: "", title: "", youtubeUrl: "", date: "", imageUrl: "" });
+  const [lessonDraft, setLessonDraft] = useState({ week: "", title: "", content: "", documentUrl: "", type: "note" });
   const [editingAnnouncementId, setEditingAnnouncementId] = useState(null);
+  const [editingLessonId, setEditingLessonId] = useState(null);
   const [editingMissionId, setEditingMissionId] = useState(null);
   const [editingEventId, setEditingEventId] = useState(null);
   const [editingMinistryId, setEditingMinistryId] = useState(null);
@@ -500,6 +502,72 @@ export default function Admin() {
     setEditingSermonId(null);
   };
 
+  const saveLesson = async (event) => {
+    event.preventDefault();
+    // allow saving quarter PDF as a special row with type 'quarter'
+    if (lessonDraft.type === "quarter") {
+      const quarterItem = {
+        id: editingLessonId || `ls-quarter-${Date.now()}`,
+        type: "quarter",
+        documentUrl: lessonDraft.documentUrl || "",
+      };
+      setData((current) => ({ ...current, lessonStudy: { ...(current.lessonStudy || {}), quarterPdfUrl: quarterItem.documentUrl || "" } }));
+      await persistItem({ table: "lessonstudy", item: quarterItem });
+      setLessonDraft({ week: "", title: "", content: "", documentUrl: "", type: "note" });
+      setEditingLessonId(null);
+      return;
+    }
+
+    if (!lessonDraft.title && !lessonDraft.week) return;
+    const lesson = {
+      id: editingLessonId || `ls-${Date.now()}`,
+      type: "note",
+      week: lessonDraft.week,
+      title: lessonDraft.title,
+      content: lessonDraft.content,
+      documentUrl: lessonDraft.documentUrl || "",
+    };
+
+    setData((current) => {
+      if (editingLessonId) {
+        return {
+          ...current,
+          lessonStudy: {
+            ...(current.lessonStudy || {}),
+            notes: (current.lessonStudy?.notes || []).map((item) => (item.id === editingLessonId ? lesson : item)),
+          },
+        };
+      }
+
+      return {
+        ...current,
+        lessonStudy: {
+          ...(current.lessonStudy || {}),
+          notes: [lesson, ...(current.lessonStudy?.notes || [])],
+        },
+      };
+    });
+
+    await persistItem({ table: "lessonstudy", item: lesson });
+    setLessonDraft({ week: "", title: "", content: "", documentUrl: "", type: "note" });
+    setEditingLessonId(null);
+  };
+
+  const deleteLesson = (itemId) => {
+    setData((current) => ({
+      ...current,
+      lessonStudy: {
+        ...(current.lessonStudy || {}),
+        notes: (current.lessonStudy?.notes || []).filter((item) => item.id !== itemId),
+      },
+    }));
+    removePersistedItem({ table: "lessonstudy", id: itemId });
+    if (editingLessonId === itemId) {
+      setLessonDraft({ week: "", title: "", content: "", documentUrl: "", type: "note" });
+      setEditingLessonId(null);
+    }
+  };
+
   const deleteSermon = (itemId) => {
     setData((current) => ({
       ...current,
@@ -656,6 +724,7 @@ export default function Admin() {
             ["choir", "Choir"],
             ["missions", "Missions"],
             ["gallery", "Gallery"],
+            ["lessonstudy", "Lesson Study"],
           ].map(([key, label]) => (
             <button key={key} className={`admin-tabs__btn ${activeTab === key ? "is-active" : ""}`} onClick={() => setActiveTab(key)} type="button">
               {label}
@@ -679,7 +748,9 @@ export default function Admin() {
                         ? updateChoir
                         : activeTab === "missions"
                           ? saveMission
-                          : saveGalleryImage
+                          : activeTab === "lessonstudy"
+                            ? saveLesson
+                            : saveGalleryImage
           }>
             {activeTab === "announcements" && (
               <>
@@ -959,6 +1030,50 @@ export default function Admin() {
               </>
             )}
 
+            {activeTab === "lessonstudy" && (
+              <>
+                <h3>Lesson Study — Quarter & Notes</h3>
+                <p style={{ marginBottom: '0.5rem' }}>Upload the quarter PDF or add weekly lesson notes below.</p>
+                <label>
+                  Note type
+                  <select value={lessonDraft.type} onChange={(e) => setLessonDraft({ ...lessonDraft, type: e.target.value })}>
+                    <option value="note">Weekly Note</option>
+                    <option value="quarter">Quarter PDF</option>
+                  </select>
+                </label>
+
+                {lessonDraft.type === 'note' ? (
+                  <>
+                    <label>
+                      Week
+                      <input value={lessonDraft.week} onChange={(event) => setLessonDraft({ ...lessonDraft, week: event.target.value })} placeholder="e.g. Week 1" />
+                    </label>
+                    <label>
+                      Title
+                      <input value={lessonDraft.title} onChange={(event) => setLessonDraft({ ...lessonDraft, title: event.target.value })} />
+                    </label>
+                    <label>
+                      Content / Notes
+                      <textarea rows="4" value={lessonDraft.content} onChange={(event) => setLessonDraft({ ...lessonDraft, content: event.target.value })} />
+                    </label>
+                    <label>
+                      Upload Lesson PDF (optional)
+                      <input type="file" accept=".pdf,.doc,.docx" onChange={(e) => handleFileUpload(e, "lessonstudy", (url) => setLessonDraft({ ...lessonDraft, documentUrl: url }))} />
+                    </label>
+                    {lessonDraft.documentUrl && <p className="admin-form__preview">Document attached: <code>{lessonDraft.documentUrl}</code></p>}
+                  </>
+                ) : (
+                  <>
+                    <label>
+                      Upload Quarter PDF
+                      <input type="file" accept=".pdf" onChange={(e) => handleFileUpload(e, "lessonstudy", (url) => setLessonDraft({ ...lessonDraft, documentUrl: url, type: 'quarter' }))} />
+                    </label>
+                    {lessonDraft.documentUrl && <p className="admin-form__preview">Quarter PDF attached: <code>{lessonDraft.documentUrl}</code></p>}
+                  </>
+                )}
+              </>
+            )}
+
             <button className="footer__submit-btn" type="submit">Save</button>
           </form>
 
@@ -1196,6 +1311,34 @@ export default function Admin() {
                 </div>
               </div>
             ))}
+
+            {activeTab === "lessonstudy" && (
+              <>
+                <div style={{ marginBottom: '1rem', borderBottom: '2px solid var(--line)', paddingBottom: '1rem' }}>
+                  <strong>Quarter PDF</strong>
+                  <p style={{ margin: '0.25rem 0' }}>{data.lessonStudy?.quarterPdfUrl ? (
+                    <a href={data.lessonStudy.quarterPdfUrl} target="_blank" rel="noreferrer">Download quarter PDF</a>
+                  ) : 'No quarter PDF uploaded yet.'}</p>
+                </div>
+
+                {(data.lessonStudy?.notes || []).map((item) => (
+                  <div key={item.id} className="admin-list__row">
+                    <div>
+                      <strong>{item.week || item.title}</strong>
+                      <p>{item.content || ''}</p>
+                    </div>
+                    <div className="admin-list__actions">
+                      <span className="admin-list__meta">{item.week}</span>
+                      <button className="admin-delete" type="button" onClick={() => {
+                        setLessonDraft({ week: item.week || '', title: item.title || '', content: item.content || '', documentUrl: item.documentUrl || '' });
+                        setEditingLessonId(item.id);
+                      }}>Edit</button>
+                      <button className="admin-delete" type="button" onClick={() => deleteLesson(item.id)}>Delete</button>
+                    </div>
+                  </div>
+                ))}
+              </>
+            )}
           </div>
         </div>
       </div>

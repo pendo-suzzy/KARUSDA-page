@@ -7,7 +7,7 @@ import "./Home.css";
 
 export default function Home() {
   const { data } = useApp();
-  const { announcements = [], stats = {}, leadership = [], sermons = [] } = data;
+  const { announcements = [], stats = {}, leadership = [], sermons = [], lessonStudy = { quarterPdfUrl: "", notes: [] } } = data;
 
   const weekSchedule = [
     { day: "Sun", label: "Choir Practice", time: "2:00 PM", color: "#C2A056" },
@@ -44,6 +44,9 @@ export default function Home() {
             <a href="#announcements" className="button button--secondary" style={{ backgroundColor: 'rgba(255,255,255,0.1)' }}>
               Read announcements
             </a>
+              <a href="#lesson-study" className="button button--secondary" style={{ backgroundColor: 'rgba(255,255,255,0.05)', marginLeft: '0.5rem' }}>
+                Lesson Study
+              </a>
           </div>
         </div>
       </HeroSlider>
@@ -138,6 +141,39 @@ export default function Home() {
             {announcements.slice(0, 3).map((announcement) => (
               <AnnouncementCard key={announcement.id} announcement={announcement} />
             ))}
+          </div>
+        </div>
+      </section>
+
+      <section id="lesson-study" className="section">
+        <div className="container">
+          <h2 className="section__title">Lesson Study</h2>
+          <p className="section__intro">Weekly Sabbath School lesson studies and resources for the quarter.</p>
+          {lessonStudy.quarterPdfUrl ? (
+            <p style={{ marginBottom: '1rem' }}>
+              <a href={lessonStudy.quarterPdfUrl} target="_blank" rel="noreferrer" className="button button--primary">Download quarter PDF</a>
+            </p>
+          ) : (
+            <p style={{ color: 'var(--muted)' }}>Quarter PDF not available.</p>
+          )}
+
+          <div className="lesson-notes__grid">
+            {(lessonStudy.notes || []).slice(0, 6).map((note) => (
+              <article key={note.id} className="lesson-note-card">
+                <div className="lesson-note-card__meta">
+                  <span className="lesson-note-card__week">{note.week || note.title || "Weekly"}</span>
+                  {note.dateTime ? <span className="lesson-note-card__date">{note.dateTime}</span> : null}
+                </div>
+                <h3 className="lesson-note-card__title">{note.title || note.week || 'Lesson'}</h3>
+                <p className="lesson-note-card__excerpt">{note.content ? (note.content.length > 180 ? note.content.substring(0, 180) + '...' : note.content) : ''}</p>
+                <div className="lesson-note-card__actions">
+                  {note.documentUrl ? (
+                    <a href={note.documentUrl} target="_blank" rel="noreferrer" className="button button--secondary">Download lesson PDF</a>
+                  ) : null}
+                </div>
+              </article>
+            ))}
+            {!(lessonStudy.notes || []).length && <p style={{ color: 'var(--muted)' }}>No lesson notes added yet.</p>}
           </div>
         </div>
       </section>
