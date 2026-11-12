@@ -1,7 +1,7 @@
 import { useMemo, useState, useEffect } from "react";
 import { useApp } from "../context/AppContext";
 import { supabase } from "../lib/supabaseClient";
-import { getThumbnail, normalizeUrl } from "../lib/urlHelpers";
+import { getThumbnail, isGooglePhotoUrl, normalizeUrl } from "../lib/urlHelpers";
 import "./Admin.css";
 
 export default function Admin() {
@@ -9,7 +9,7 @@ export default function Admin() {
   const [activeTab, setActiveTab] = useState("announcements");
   const [announcementDraft, setAnnouncementDraft] = useState({ title: "", body: "", date: "", imageUrl: "", documentUrl: "" });
   const [missionDraft, setMissionDraft] = useState({ title: "", year: "", summary: "", goalKes: "", raisedKes: "", documentUrl: "", missionType: "upcoming" });
-  const [galleryDraft, setGalleryDraft] = useState({ caption: "", src: "", imageUrl: "", date: "" });
+  const [galleryDraft, setGalleryDraft] = useState({ caption: "", src: "", date: "" });
   const [eventDraft, setEventDraft] = useState({ title: "", dateTime: "", location: "", description: "", category: "services", imageUrl: "", documentUrl: "" });
   const [ministryDraft, setMinistryDraft] = useState({ name: "", tagline: "", description: "", dateTime: "", documentUrl: "" });
   const [leadershipDraft, setLeadershipDraft] = useState({ name: "", role: "", bio: "", photo: "" });
@@ -244,7 +244,8 @@ export default function Admin() {
     event.preventDefault();
     if (!galleryDraft.caption || !galleryDraft.src) return;
     const normalizedSrc = normalizeUrl(galleryDraft.src.trim());
-    const normalizedThumbnail = normalizeUrl(galleryDraft.imageUrl.trim()) || getThumbnail(normalizedSrc) || "";
+    const normalizedThumbnail = getThumbnail(normalizedSrc)
+      || (isGooglePhotoUrl(normalizedSrc) ? "" : normalizedSrc);
     const galleryItem = {
       id: editingGalleryId || `p-${Date.now()}`,
       src: normalizedSrc,
@@ -271,7 +272,7 @@ export default function Admin() {
       };
     });
     await persistItem({ table: "gallery", item: galleryItem });
-    setGalleryDraft({ caption: "", src: "", imageUrl: "", date: "" });
+    setGalleryDraft({ caption: "", src: "", date: "" });
     setEditingGalleryId(null);
   };
 
@@ -282,7 +283,7 @@ export default function Admin() {
     }));
     removePersistedItem({ table: "gallery", id: itemId });
     if (editingGalleryId === itemId) {
-      setGalleryDraft({ caption: "", src: "", imageUrl: "", date: "" });
+      setGalleryDraft({ caption: "", src: "", date: "" });
       setEditingGalleryId(null);
     }
   };
@@ -1022,12 +1023,8 @@ export default function Admin() {
                   <input value={galleryDraft.src} onChange={(event) => setGalleryDraft({ ...galleryDraft, src: event.target.value })} placeholder="Enter URL or upload a file below" />
                 </label>
                 <label>
-                  Thumbnail image URL
-                  <input value={galleryDraft.imageUrl} onChange={(event) => setGalleryDraft({ ...galleryDraft, imageUrl: event.target.value })} placeholder="Paste a direct Google Photos image URL (lh3.googleusercontent.com)" />
-                </label>
-                <label>
                   Upload Image
-                  <input type="file" accept="image/*" onChange={(e) => handleFileUpload(e, "gallery", (url) => setGalleryDraft({ ...galleryDraft, src: url, imageUrl: url }))} />
+                  <input type="file" accept="image/*" onChange={(e) => handleFileUpload(e, "gallery", (url) => setGalleryDraft({ ...galleryDraft, src: url }))} />
                 </label>
                 <p className="admin-form__preview">
                   Gallery link: <code>{normalizedGalleryUrl || "Enter a Google Photos link or upload an image"}</code>
@@ -1308,7 +1305,7 @@ export default function Admin() {
                 <div className="admin-list__actions">
                   <span className="admin-list__meta">{item.date || ""}</span>
                   <button className="admin-delete" type="button" onClick={() => {
-                    setGalleryDraft({ caption: item.caption, src: item.src, imageUrl: item.imageUrl || "", date: item.date || "" });
+                    setGalleryDraft({ caption: item.caption, src: item.src, date: item.date || "" });
                     setEditingGalleryId(item.id);
                     window.scrollTo({ top: 0, behavior: "smooth" });
                   }}>Edit</button>
