@@ -5,7 +5,7 @@ import { getThumbnail, isGooglePhotoUrl, normalizeUrl } from "../lib/urlHelpers"
 import "./Admin.css";
 
 export default function Admin() {
-  const { data, setData, syncItem, removeItem, getUniqueId } = useApp();
+  const { data, setData, syncItem, removeItem, getUniqueId, fetchAppData } = useApp();
   const [activeTab, setActiveTab] = useState("announcements");
   const [announcementDraft, setAnnouncementDraft] = useState({ title: "", body: "", date: "", imageUrl: "", documentUrl: "" });
   const [missionDraft, setMissionDraft] = useState({ title: "", year: "", summary: "", goalKes: "", raisedKes: "", documentUrl: "", missionType: "upcoming" });
@@ -111,6 +111,11 @@ export default function Admin() {
       const errorMsg = `Database save failed for ${table}: ${err.message || JSON.stringify(err)}`;
       setSaveError(errorMsg);
       alert(errorMsg);
+      try {
+        setData(await fetchAppData());
+      } catch (refreshError) {
+        console.error("Unable to restore data after failed save:", refreshError);
+      }
     }
   };
 
@@ -123,6 +128,11 @@ export default function Admin() {
       const errorMsg = `Database delete failed for ${table}: ${err.message || JSON.stringify(err)}`;
       setSaveError(errorMsg);
       alert(errorMsg);
+      try {
+        setData(await fetchAppData());
+      } catch (refreshError) {
+        console.error("Unable to restore data after failed delete:", refreshError);
+      }
     }
   };
 

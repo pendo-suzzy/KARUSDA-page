@@ -83,7 +83,6 @@ const TABLE_NAMES = [
   "choir",
   "missions",
   "sermon",
-  "lessonstudy",
 ];
 
 const normalizeTableName = (tableName) => {
