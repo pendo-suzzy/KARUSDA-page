@@ -25,6 +25,10 @@ const normalizeItemForTable = ({ table_name, item }) => {
 
   if (table_name === "gallery") {
     normalizedItem.src = normalizeUrl(normalizedItem.src || normalizedItem.url || normalizedItem.photoUrl);
+    normalizedItem.imageupload = normalizeUrl(normalizedItem.imageUrl) || normalizedItem.src;
+    normalizedItem.imageurl = normalizedItem.src;
+    delete normalizedItem.imageUrl;
+    delete normalizedItem.src;
   }
 
   if (table_name === "leadership") {
@@ -45,22 +49,12 @@ const normalizeItemForTable = ({ table_name, item }) => {
     delete normalizedItem.documentUrl;
   }
 
-  if (normalizedItem.imageUrl !== undefined) {
+  if (normalizedItem.imageUrl !== undefined && table_name !== "gallery") {
     normalizedItem.imageurl = normalizedItem.imageUrl;
-    if (["announcements", "events", "gallery"].includes(table_name)) {
+    if (["announcements", "events"].includes(table_name)) {
       normalizedItem.imageupload = normalizedItem.imageUrl;
     }
     delete normalizedItem.imageUrl;
-  }
-
-  if (table_name === "gallery" && normalizedItem.src !== undefined) {
-    if (!normalizedItem.imageupload) {
-      normalizedItem.imageupload = normalizedItem.src;
-    }
-    if (!normalizedItem.imageurl) {
-      normalizedItem.imageurl = normalizedItem.src;
-    }
-    delete normalizedItem.src;
   }
 
   if (table_name === "events" || table_name === "ministries") {
@@ -101,8 +95,8 @@ const normalizeTableName = (tableName) => {
 const mapRowFromDb = (row) => ({
   ...row,
   documentUrl: row.documenturl || row.documentUrl || "",
-  imageUrl: row.imageurl || row.imageupload || row.imageUrl || "",
-  src: row.imageurl || row.imageupload || row.src || "",
+  imageUrl: row.imageupload || row.imageurl || row.imageUrl || "",
+  src: row.imageurl || row.src || row.imageupload || "",
   youtubeUrl: row.youtubeurl || row.youtubeUrl || "",
   dateTime: row["date/time"] || row.dateTime || (row.date && row.time ? `${row.date}T${row.time}` : "") || (row.meetingDay && row.meetingTime ? `${row.meetingDay} ${row.meetingTime}` : ""),
 });

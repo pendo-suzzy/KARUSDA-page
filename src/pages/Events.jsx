@@ -144,8 +144,11 @@ export default function Events() {
             {gallery.map((image) => {
               const rawUrl = image.src || image.url || image.photoUrl;
               const displayUrl = normalizeUrl(rawUrl);
-              const thumb = getThumbnail(rawUrl);
-              const imageSrc = thumb || displayUrl || rawUrl;
+              const thumbnailUrl = normalizeUrl(image.imageUrl);
+              const thumb = getThumbnail(thumbnailUrl) || getThumbnail(rawUrl);
+              const imageSrc = thumb
+                || (thumbnailUrl && !isGooglePhotoUrl(thumbnailUrl) ? thumbnailUrl : null)
+                || (!isGooglePhotoUrl(rawUrl) ? displayUrl || rawUrl : null);
               const clickTarget = rawUrl || displayUrl;
               const hasFailed = Boolean(failedImages[image.id]);
               return (
